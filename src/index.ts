@@ -1,8 +1,12 @@
 require('dotenv').config()
 import express, {Request, Response} from 'express';
+import logger_middleware from './middleware/logger';
+import logger from './utils/logger';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+app.use(logger_middleware);
 
 app.get('/', (req: Request, res: Response) => {
     res.send("I am working");
@@ -15,13 +19,13 @@ app.get('/health', (req: Request, res: Response) => {
 });
   
 const server = app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+    logger.info(`Server is running on http://localhost:${PORT}`);
 });
   
 
 process.on('SIGTERM', () => {
-    console.log('SIGTERM signal received: closing HTTP server')
+    logger.warn('SIGTERM signal received: closing HTTP server')
     server.close(() => {
-        console.log('HTTP server closed')
+        logger.info('HTTP server closed')
     })
 })
