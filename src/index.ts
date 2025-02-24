@@ -1,4 +1,6 @@
 require('dotenv').config()
+const config = require('config');
+
 import express, {Request, Response} from 'express';
 import logger_middleware from './middleware/logger';
 import logger from './utils/logger';
@@ -23,9 +25,31 @@ const server = app.listen(PORT, () => {
 });
   
 
+async function start() {
+    try {
+      //Initialize all dependencies
+      const x = config.get(process.env.CHAIN_ID!);
+      logger.info(x);
+    } catch (error) {
+      logger.error(`Error starting service: ${error}`);
+    }
+  }
+  
+  async function stop() {
+    try {
+      //Close all dependencies
+      logger.info('Service stopped');
+    } catch (error) {
+      logger.error(`Error stopping service: ${error}`);
+    }
+  }
+
 process.on('SIGTERM', () => {
-    logger.warn('SIGTERM signal received: closing HTTP server')
+    logger.info('SIGTERM signal received: closing HTTP server')
+    stop()
     server.close(() => {
         logger.info('HTTP server closed')
     })
 })
+
+start()

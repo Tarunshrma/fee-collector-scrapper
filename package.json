@@ -34,6 +34,7 @@
   "dependencies": {
     "@eslint/js": "^9.21.0",
     "@types/express": "^5.0.0",
+    "config": "^3.3.12",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "pino": "^9.6.0",
