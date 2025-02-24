@@ -1,0 +1,10 @@
+*.DS_Store
+*.env
+*.npm-debug.log
+*.vscode
+*node_modules
+package-lock.json
+
+.idea
+*build
+*logs
