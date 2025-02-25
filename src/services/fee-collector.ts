@@ -11,8 +11,15 @@ export class FeeCollector implements FeeCollectorInterface{
         this.config = config;
     }
     
-    fetchFees(): Promise<void>{
+    public fetchFees(): Promise<void>{
         throw new Error('Method not implemented.');
+    }
+
+    /**
+     * Fetch historical blocks from target blockchain
+     */
+    private async fetchHistoricalBlocks(): Promise<void>{
+        
     }
 
 }
