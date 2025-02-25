@@ -4,8 +4,8 @@ const config = require('config');
 import express, {Request, Response} from 'express';
 import logger_middleware from './middleware/logger';
 import logger from './utils/logger';
-import ChainConfig from './types/types';
 import { FeeCollector } from './services/fee-collector';
+import { ChainConfig } from './types/types';
 
 const app = express();
 const PORT = process.env.PORT || 3000;

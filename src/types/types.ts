@@ -1,3 +1,5 @@
+import {BigNumber} from '@ethersproject/bignumber';
+
 /**
  * ChainConfig type
  * @typedef {Object} ChainConfig
@@ -11,9 +13,24 @@ type ChainConfig = {
     contract_address: string,
     rpc_url: string,
     secondary_rpc_url: string,
-    start_block: string,
+    start_block: number,
     block_batch_size: number
 }
 
+/**
+ * ParsedFeeCollectedEvents type
+ * @typedef {Object} ParsedFeeCollectedEvents
+ * @property {string} token - the address of the token that was collected
+ * @property {string} integrator - the integrator that triggered the fee collection
+ * @property {BigNumber} integratorFee - the share collector for the integrator
+ * @property {BigNumber} lifiFee - the share collected for lifi
+ * @property {BigNumber} totalFee - the total fee collected
+ */
+type ParsedFeeCollectedEvents = {
+    token: string;
+    integrator: string;
+    integratorFee: BigNumber;
+    lifiFee: BigNumber;
+}
 
-export default ChainConfig;
+export {ChainConfig, ParsedFeeCollectedEvents};
