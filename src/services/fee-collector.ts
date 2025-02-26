@@ -55,10 +55,26 @@ export class FeeCollector implements FeeCollectorInterface{
     */
     private async fetchHistoricalBlocks(): Promise<void>{
         try{
+
+            const interfaces = new ethers.Interface(FeeCollector__factory.abi)
+            const feeCollector = new ethers.Contract(this.config.contract_address, interfaces, this.jsonProvider)
+            const filter = feeCollector.filters.FeesCollected()
+
+            //fetch events from the blockchain until the seed block
             while(this.backwardCursor > this.config.start_block){
+                //fetch events in batches
                 const start_block = this.backwardCursor - this.config.block_batch_size;
                 logger.debug(`Fetching event from block ${start_block} to ${this.backwardCursor}`);
-                const events = await this.loadFeeCollectorEvents(start_block, this.backwardCursor)
+                
+                //fetch events from the blockchain
+                const rawEvents = await feeCollector.queryFilter(filter, start_block, this.backwardCursor) as EventLog[]
+                
+                //if events are found, parse and save them
+                if(rawEvents.length > 0){
+                    this.saveParsedEvents(start_block.toString(), rawEvents, feeCollector)
+                }
+                
+                //update the backward cursor
                 this.backwardCursor = start_block;
             }
         }catch(error){
@@ -68,33 +84,6 @@ export class FeeCollector implements FeeCollectorInterface{
     }
 
     /**
-     * For a given block range all `FeesCollected` events are loaded from the Polygon FeeCollector
-     * @param fromBlock
-     * @param toBlock
-     */
-     private async loadFeeCollectorEvents (fromBlock: BlockTag, toBlock: BlockTag): Promise<void>  {
-        const filePath = path.join(DATA_LOGS_PATH, `${fromBlock}.json`);
-        const writerStream = fs.createWriteStream(filePath)
-        
-        if (!writerStream) {
-            throw new Error(`[loadFeeCollectorEvents]: Error creating write stream for file: ${filePath}`)
-        }
-
-        try{
-            const interfaces = new ethers.Interface(FeeCollector__factory.abi)
-            const feeCollector = new ethers.Contract(this.config.contract_address, interfaces, this.jsonProvider)
-            const filter = feeCollector.filters.FeesCollected()
-            const events = await feeCollector.queryFilter(filter, fromBlock, toBlock) as EventLog[]
-            writerStream.write(JSON.stringify(events))
-        }catch(error){
-            logger.error(`[loadFeeCollectorEvents]: Error loading fee collector events: ${error}`)
-            throw error
-        }finally{
-            writerStream.end()
-        }
-     }
-
-     /**
     * Takes a list of raw events and parses them into ParsedFeeCollectedEvents
     * @param events
     */
@@ -118,19 +107,21 @@ export class FeeCollector implements FeeCollectorInterface{
             logger.error(`[parseFeeCollectorEvents]: Error parsing fee collector events: ${error}`)
             throw error
         }
-        
-        // return events.map(async (event) => {
-        //     const parsedEvent = feeCollectorContract.interface.parseLog(event)
-        //     if (parsedEvent !== null) {
-        //         const feesCollected: ParsedFeeCollectedEvents = {
-        //             token: parsedEvent.args[0],
-        //             integrator: parsedEvent.args[1],
-        //             integratorFee: BigNumber.from(parsedEvent.args[2]),
-        //             lifiFee: BigNumber.from(parsedEvent.args[3]),
-        //         }
-        //     }
-        // }
     }
-  
 
+    /**
+    * Save parsed events to a file
+    * @param fromBlock
+    */
+    private async  saveParsedEvents (fromBlock: string,rawEvents : ethers.EventLog[], feeCollector: ethers.Contract): Promise<void> {
+        try{
+            const filePath = path.join(DATA_LOGS_PATH, `${fromBlock}.json`);
+            const writerStream = fs.createWriteStream(filePath)
+            const parsedEvents = await this.parseFeeCollectorEvents(rawEvents, feeCollector)
+            writerStream.end(JSON.stringify(parsedEvents))
+        }catch(error){
+            logger.error(`[saveParsedEvents]: Error saving parsed events: ${error}`)
+            throw error
+        }
+    } 
 }
