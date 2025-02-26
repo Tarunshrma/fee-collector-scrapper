@@ -5,25 +5,27 @@ import { ethers, EventLog } from 'ethers';
 import {FeeCollector__factory} from '../../lifi-contract-types'
 import logger from '../utils/logger';
 import {BigNumber} from '@ethersproject/bignumber';
+import EventEmitter from 'node:events';
 import fs from 'fs';
-import stream from 'stream';
 import path from 'path';
+import { Constants } from '../utils/constants';
 
 
 const DATA_LOGS_PATH = path.join("./", 'data');
+
 /**
  * FeeCollector class
  * @implements FeeCollectorInterface
  */
 export class FeeCollector implements FeeCollectorInterface{
-    private config: ChainConfig;
+    // private config: ChainConfig;
     private jsonProvider: ethers.JsonRpcProvider;
 
     private backwardCursor: number = 0;
     private forwardCursor: number = 0;
 
     //TODO: Inject EVM liberary to interact with blockchain as dependency
-    constructor(config: ChainConfig){
+    constructor(private config: ChainConfig,private eventEmitter: EventEmitter){
         this.config = config;
         this.jsonProvider = new ethers.JsonRpcProvider(this.config.rpc_url)
     }
@@ -119,6 +121,7 @@ export class FeeCollector implements FeeCollectorInterface{
             const writerStream = fs.createWriteStream(filePath)
             const parsedEvents = await this.parseFeeCollectorEvents(rawEvents, feeCollector)
             writerStream.end(JSON.stringify(parsedEvents))
+            this.eventEmitter.emit(Constants.EVENT_BLOCKS_SAVED, filePath);
         }catch(error){
             logger.error(`[saveParsedEvents]: Error saving parsed events: ${error}`)
             throw error

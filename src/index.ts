@@ -6,6 +6,9 @@ import logger_middleware from './middleware/logger';
 import logger from './utils/logger';
 import { FeeCollector } from './services/fee-collector';
 import { ChainConfig } from './types/types';
+import { StoreFeeData } from './services/store-fee-data';
+import EventEmitter from 'node:events';
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -27,15 +30,20 @@ const server = app.listen(PORT, () => {
 });
   
 
+
 async function start() {
     try {
-      //Initialize all dependencies
-      const chainConfig:ChainConfig = config.get(process.env.CHAIN_ID!) as ChainConfig;
-      logger.info(`Service started for chain: ${process.env.CHAIN_ID!}`);
+        const eventEmitter = new EventEmitter();
+        new StoreFeeData(eventEmitter)
 
-      const feeCollector = new FeeCollector(chainConfig);
-      await feeCollector.setup();
-      await feeCollector.fetchFees();
+        //Initialize all dependencies
+        const chainConfig:ChainConfig = config.get(process.env.CHAIN_ID!) as ChainConfig;
+        logger.info(`Service started for chain: ${process.env.CHAIN_ID!}`);
+
+        const feeCollector = new FeeCollector(chainConfig,eventEmitter);
+        await feeCollector.setup();
+        await feeCollector.fetchFees();
+
     } catch (error) {
       logger.error(`Error starting service: ${error}`);
     }
