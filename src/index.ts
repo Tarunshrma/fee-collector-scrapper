@@ -34,7 +34,8 @@ async function start() {
       logger.info(`Service started for chain: ${process.env.CHAIN_ID!}`);
 
       const feeCollector = new FeeCollector(chainConfig);
-      feeCollector.fetchFees();
+      await feeCollector.setup();
+      await feeCollector.fetchFees();
     } catch (error) {
       logger.error(`Error starting service: ${error}`);
     }
