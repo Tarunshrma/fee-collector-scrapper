@@ -5,7 +5,7 @@ import express, {Request, Response} from 'express';
 import logger_middleware from './middleware/logger';
 import logger from './utils/logger';
 import { FeeCollector } from './services/fee-collector';
-import { ChainConfig } from './types/types';
+import { ChainConfig, ParsedFeeCollectedEvents, RawEventLogs } from './types/types';
 import { StoreFeeData } from './services/store-fee-data';
 import EventEmitter from 'node:events';
 import { EtherJSFeesCollectorAdapter } from './services/etherjs-web3-adapter';
@@ -41,7 +41,7 @@ async function start() {
         const chainConfig:ChainConfig = config.get(process.env.CHAIN_ID!) as ChainConfig;
         logger.info(`Service started for chain: ${process.env.CHAIN_ID!}`);
 
-        const etherJSFeeCollector = new EtherJSFeesCollectorAdapter(chainConfig);
+        const etherJSFeeCollector = new EtherJSFeesCollectorAdapter<RawEventLogs,ParsedFeeCollectedEvents>(chainConfig);
         const feeCollector = new FeeCollector(chainConfig,eventEmitter,etherJSFeeCollector);
         
         await feeCollector.setup();

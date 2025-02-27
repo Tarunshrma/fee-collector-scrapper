@@ -11,7 +11,7 @@ import logger from "../utils/logger";
  * @implements Web3AdapterInterface
  */
 //TODO: If time allow try to make it more generic 
-export class EtherJSFeesCollectorAdapter implements Web3AdapterInterface<RawEventLogs, ParsedFeeCollectedEvents>{
+export class EtherJSFeesCollectorAdapter<Event extends RawEventLogs,Type> implements Web3AdapterInterface<Event,Type> {
     private jsonProvider: ethers.JsonRpcProvider;
     private feeCollectorContract: ethers.Contract;
     private feeCollectorFilter: ethers.DeferredTopicFilter;
@@ -26,9 +26,9 @@ export class EtherJSFeesCollectorAdapter implements Web3AdapterInterface<RawEven
         this.feeCollectorFilter = this.feeCollectorContract.filters.FeesCollected()
     }
 
-    public async fetchRawFeesCollectedEvents(from:number ,to :number): Promise<RawEventLogs[]>{
+    public async fetchRawFeesCollectedEvents(from:number ,to :number): Promise<Event[]>{
         try{
-            const rawEvents = await this.feeCollectorContract.queryFilter(this.feeCollectorFilter, from, to) as RawEventLogs[]
+            const rawEvents = await this.feeCollectorContract.queryFilter(this.feeCollectorFilter, from, to) as Event[]
             return rawEvents;
         }catch(error){
             logger.error(`[fetchRawFeesCollectedEvents]: Error fetching blocks: ${error}`)
@@ -36,18 +36,18 @@ export class EtherJSFeesCollectorAdapter implements Web3AdapterInterface<RawEven
         }
     }
 
-    public async parseRawBlocks(rawBlocksEvent:RawEventLogs[]): Promise<ParsedFeeCollectedEvents[]>{
+    public async parseRawBlocks(rawBlocksEvent:Event[]): Promise<Type[]>{
         try{
-            let parsedEvents: ParsedFeeCollectedEvents[] = []
+            let parsedEvents: Type[] = []
             rawBlocksEvent.forEach(event => {
                 const parsedEvent = this.feeCollectorContract.interface.parseLog(event)
                 if (parsedEvent !== null) {
-                    const feesCollected: ParsedFeeCollectedEvents = {
+                    const feesCollected: Type = {
                         token: parsedEvent.args[0],
                         integrator: parsedEvent.args[1],
                         integratorFee: BigNumber.from(parsedEvent.args[2]),
                         lifiFee: BigNumber.from(parsedEvent.args[3]),
-                    }
+                    } as Type
                     parsedEvents.push(feesCollected)
                 }
             });
