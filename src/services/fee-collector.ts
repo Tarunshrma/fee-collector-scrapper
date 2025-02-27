@@ -66,7 +66,7 @@ export class FeeCollector implements FeeCollectorInterface{
             while(this.backwardCursor > this.config.start_block){
                 //fetch events in batches
                 const start_block = this.backwardCursor - this.config.block_batch_size;
-                logger.debug(`Fetching event from block ${start_block} to ${this.backwardCursor}`);
+                //logger.debug(`Fetching event from block ${start_block} to ${this.backwardCursor}`);
                 
                 //fetch events from the blockchain
                 const rawEvents = await feeCollector.queryFilter(filter, start_block, this.backwardCursor) as EventLog[]
@@ -127,4 +127,12 @@ export class FeeCollector implements FeeCollectorInterface{
             throw error
         }
     } 
+
+    //TODO: Implement stop method
+    /**
+     * Stop the fee collector service and clean up resources
+     */
+    public stop(): void {
+        
+    }
 }
