@@ -1,4 +1,4 @@
-import { ethers } from "ethers";
+import { BlockTag, ethers } from "ethers";
 import { ChainConfig, ParsedFeeCollectedEvents, RawEventLogs } from "../types/types";
 import {FeeCollector__factory} from '../../lifi-contract-types'
 import {BigNumber} from '@ethersproject/bignumber';
@@ -26,7 +26,7 @@ export class EtherJSFeesCollectorAdapter implements Web3AdapterInterface<RawEven
         this.feeCollectorFilter = this.feeCollectorContract.filters.FeesCollected()
     }
 
-    public async fetchRawFeesCollectedEvents(from:string , to :string): Promise<RawEventLogs[]>{
+    public async fetchRawFeesCollectedEvents(from:number ,to :number): Promise<RawEventLogs[]>{
         try{
             const rawEvents = await this.feeCollectorContract.queryFilter(this.feeCollectorFilter, from, to) as RawEventLogs[]
             return rawEvents;

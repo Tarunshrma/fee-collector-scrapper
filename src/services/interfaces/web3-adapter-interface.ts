@@ -5,7 +5,7 @@ interface Web3AdapterInterface<E,T> {
      * @param to to block number
      * @returns E[] returns an array of raw blocks
      */
-    fetchRawFeesCollectedEvents(from:string , to :string): Promise<E[]>
+    fetchRawFeesCollectedEvents(from:number , to :number): Promise<E[]>
 
     /**
      * Parse raw blocks into target type T

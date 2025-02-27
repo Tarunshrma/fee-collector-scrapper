@@ -8,6 +8,7 @@
     "lint": "eslint . --ext .ts",
     "dev": "ts-node-dev --respawn ./src/index.ts",
     "start": "ts-node ./src/index.ts",
+    "clean": "rm -rf dist/ & rm -rf data/ & rm -rf backup/",
     "test": "jest"
   },
   "keywords": [

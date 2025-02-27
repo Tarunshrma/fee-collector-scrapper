@@ -69,7 +69,7 @@ export class FeeCollector implements FeeCollectorInterface{
                 const start_block = this.backwardCursor - this.config.block_batch_size;
 
                 //fetch events from the blockchain
-                const rawEvents = await this.web3AdapterInterface.fetchRawFeesCollectedEvents(start_block.toString(), this.backwardCursor.toString()) as RawEventLogs[]
+                const rawEvents = await this.web3AdapterInterface.fetchRawFeesCollectedEvents(start_block, this.backwardCursor) as RawEventLogs[]
                 
                 //if events are found, parse and save them
                 if(rawEvents.length > 0){
