@@ -24,17 +24,48 @@ class MockFeesCollectorAdapter implements Web3AdapterInterface<RawEventLogs, Par
 
 
 describe('FeeCollector', () => {
-  const dummyConfig = {} as any; 
-  const eventEmitter = new EventEmitter();
-  const mockFeeCollector = new MockFeesCollectorAdapter(dummyConfig);
+
+  let mockFeeCollector: MockFeesCollectorAdapter;
+  let feeCollector: FeeCollector;
+
+  beforeEach(() => {
+    const dummyConfig = {} as any; 
+
+    mockFeeCollector = new MockFeesCollectorAdapter(dummyConfig);
+
+    const eventEmitter = new EventEmitter();
+    feeCollector = new FeeCollector(dummyConfig,eventEmitter,mockFeeCollector);
+    (feeCollector as any).setup_complete = true;
+
+  });
+
+  // const mockFeeCollector = new MockFeesCollectorAdapter(dummyConfig);
 
   it('should instantiate FeeCollector correctly', () => {
-    const feeCollector = new FeeCollector(dummyConfig,eventEmitter,mockFeeCollector);
     expect(feeCollector).toBeInstanceOf(FeeCollector);
   });
 
-  // it('should throw "Method not implemented." error on fetchFees', async () => {
-  //   const feeCollector = new FeeCollector(dummyConfig,eventEmitter,etherJSFeeCollector);
-  //   await expect(feeCollector.fetchFees()).rejects.toThrow('Method not implemented.');
-  // });
+  it('should throw "Fee collector setup not complete" error on fetchFees', async () => {
+    (feeCollector as any).setup_complete = false;
+    await expect(feeCollector.fetchFees()).rejects.toThrow('Fee collector setup not complete');
+  });
+
+  it('internal method fetchHistoricalBlocks should be called on fetchFees ', async () => {
+    
+    //Setup
+    const fetchHistoricalBlocksSpy = jest.spyOn(feeCollector as any, 'fetchHistoricalBlocks');
+    
+    await feeCollector.setup();
+    await feeCollector.fetchFees();
+    
+    //Expectations
+    expect(fetchHistoricalBlocksSpy).toHaveBeenCalled();
+  });
+
+  //FIXME: This test is not working as expected
+  it('should throw "Fee collector setup not complete" calling stop without setup', async () => {
+    (feeCollector as any).setup_complete = false;
+    await expect(feeCollector.stop()).rejects.toThrow('Fee collector setup not complete');
+  });
+
 });
