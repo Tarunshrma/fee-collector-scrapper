@@ -59,7 +59,8 @@ export class StoreFeeData {
             });
             readerStream.on('close', () => {
                 // delete the file
-                logger.info("data reading finished, move the file to backup, a seperate")
+                logger.info("data reading finished, move the file to backup, a seperate location like S3 bucket")
+                //TODO: For now we are moving the file to backup, in production we can move it to S3 bucket
                 fs.rename(filePath, path.join(BACKUP_DATA_PATH, `backup-${path.basename(filePath)}`), (err) => {
                     if (err) throw err;
                     logger.info('File moved to backup');
