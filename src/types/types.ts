@@ -1,4 +1,5 @@
 import {BigNumber} from '@ethersproject/bignumber';
+import { ethers } from 'ethers';
 
 /**
  * ChainConfig type
@@ -33,4 +34,10 @@ type ParsedFeeCollectedEvents = {
     lifiFee: BigNumber;
 }
 
-export {ChainConfig, ParsedFeeCollectedEvents};
+
+//Here we are defining the type of the raw events that we are fetching from the blockchain
+//For other libraries like web3.js, the type of the raw events might be different
+//For ethers.js, the type of the raw events is ethers.EventLog
+type RawEventLogs  = ethers.EventLog 
+
+export {ChainConfig, ParsedFeeCollectedEvents, RawEventLogs};

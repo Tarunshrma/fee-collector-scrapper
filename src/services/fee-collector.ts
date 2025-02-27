@@ -1,14 +1,11 @@
-import { BlockTag } from '@ethersproject/abstract-provider';
-import {ChainConfig, ParsedFeeCollectedEvents} from '../types/types';
+import {ChainConfig, ParsedFeeCollectedEvents, RawEventLogs} from '../types/types';
 import FeeCollectorInterface from './interfaces/fee-collector-interface';
-import { ethers, EventLog } from 'ethers';
-import {FeeCollector__factory} from '../../lifi-contract-types'
 import logger from '../utils/logger';
-import {BigNumber} from '@ethersproject/bignumber';
 import EventEmitter from 'node:events';
 import fs from 'fs';
 import path from 'path';
 import { Constants } from '../utils/constants';
+import Web3AdapterInterface from './interfaces/web3-adapter-interface';
 
 
 const DATA_LOGS_PATH = path.join("./", 'data');
@@ -18,16 +15,15 @@ const DATA_LOGS_PATH = path.join("./", 'data');
  * @implements FeeCollectorInterface
  */
 export class FeeCollector implements FeeCollectorInterface{
-    // private config: ChainConfig;
-    private jsonProvider: ethers.JsonRpcProvider;
-
     private backwardCursor: number = 0;
     private forwardCursor: number = 0;
 
-    //TODO: Inject EVM liberary to interact with blockchain as dependency
-    constructor(private config: ChainConfig,private eventEmitter: EventEmitter){
+    private setup_complete: boolean = false;
+
+    constructor(private config: ChainConfig,
+        private eventEmitter: EventEmitter,
+        private web3AdapterInterface:Web3AdapterInterface<RawEventLogs, ParsedFeeCollectedEvents>){
         this.config = config;
-        this.jsonProvider = new ethers.JsonRpcProvider(this.config.rpc_url)
     }
 
     public async setup(): Promise<void>{
@@ -35,19 +31,24 @@ export class FeeCollector implements FeeCollectorInterface{
             //
             //TODO: Implement redis cache & Load the forward and backward cursors from redis cache
             //WORKAROUND: Setting up cursors to start from the current block
-            const current_block = await this.jsonProvider.getBlockNumber();
+            const current_block = await this.web3AdapterInterface.getLatestBlockNumber();
             this.backwardCursor = current_block;
             this.forwardCursor = current_block + 1;
 
             if (!fs.existsSync(DATA_LOGS_PATH)) {
                 fs.mkdirSync(DATA_LOGS_PATH, { recursive: true });
             }
+
+            this.setup_complete = true;
         }catch(error){
             logger.error(`Error setting up fee collector: ${error}`)
         }
     }
     
     public async fetchFees(): Promise<void>{
+        if(!this.setup_complete){
+            throw new Error('Fee collector setup not complete');
+        }
         //<------- backward cursor
         await this.fetchHistoricalBlocks()
     }
@@ -58,22 +59,21 @@ export class FeeCollector implements FeeCollectorInterface{
     private async fetchHistoricalBlocks(): Promise<void>{
         try{
 
-            const interfaces = new ethers.Interface(FeeCollector__factory.abi)
-            const feeCollector = new ethers.Contract(this.config.contract_address, interfaces, this.jsonProvider)
-            const filter = feeCollector.filters.FeesCollected()
+            if(!this.setup_complete){
+                throw new Error('Fee collector setup not complete');
+            }
 
             //fetch events from the blockchain until the seed block
             while(this.backwardCursor > this.config.start_block){
                 //fetch events in batches
                 const start_block = this.backwardCursor - this.config.block_batch_size;
-                //logger.debug(`Fetching event from block ${start_block} to ${this.backwardCursor}`);
-                
+
                 //fetch events from the blockchain
-                const rawEvents = await feeCollector.queryFilter(filter, start_block, this.backwardCursor) as EventLog[]
+                const rawEvents = await this.web3AdapterInterface.fetchRawFeesCollectedEvents(start_block.toString(), this.backwardCursor.toString()) as RawEventLogs[]
                 
                 //if events are found, parse and save them
                 if(rawEvents.length > 0){
-                    this.saveParsedEvents(start_block.toString(), rawEvents, feeCollector)
+                    this.saveParsedEvents(start_block.toString(), rawEvents)
                 }
                 
                 //update the backward cursor
@@ -86,40 +86,14 @@ export class FeeCollector implements FeeCollectorInterface{
     }
 
     /**
-    * Takes a list of raw events and parses them into ParsedFeeCollectedEvents
-    * @param events
-    */
-    private async  parseFeeCollectorEvents (events: ethers.EventLog[], feeCollectorContract: ethers.Contract): Promise<ParsedFeeCollectedEvents[]> {
-        try{
-            let parsedEvents: ParsedFeeCollectedEvents[] = []
-            events.forEach(event => {
-                const parsedEvent = feeCollectorContract.interface.parseLog(event)
-                if (parsedEvent !== null) {
-                    const feesCollected: ParsedFeeCollectedEvents = {
-                        token: parsedEvent.args[0],
-                        integrator: parsedEvent.args[1],
-                        integratorFee: BigNumber.from(parsedEvent.args[2]),
-                        lifiFee: BigNumber.from(parsedEvent.args[3]),
-                    }
-                    parsedEvents.push(feesCollected)
-                }
-            });
-            return parsedEvents
-        }catch(error){
-            logger.error(`[parseFeeCollectorEvents]: Error parsing fee collector events: ${error}`)
-            throw error
-        }
-    }
-
-    /**
     * Save parsed events to a file
     * @param fromBlock
     */
-    private async  saveParsedEvents (fromBlock: string,rawEvents : ethers.EventLog[], feeCollector: ethers.Contract): Promise<void> {
+    private async  saveParsedEvents (fromBlock: string,rawEvents : RawEventLogs[]): Promise<void> {
         try{
             const filePath = path.join(DATA_LOGS_PATH, `${fromBlock}.json`);
             const writerStream = fs.createWriteStream(filePath)
-            const parsedEvents = await this.parseFeeCollectorEvents(rawEvents, feeCollector)
+            const parsedEvents = await this.web3AdapterInterface.parseRawBlocks(rawEvents)
             writerStream.end(JSON.stringify(parsedEvents))
             this.eventEmitter.emit(Constants.EVENT_BLOCKS_SAVED, filePath);
         }catch(error){
@@ -133,6 +107,8 @@ export class FeeCollector implements FeeCollectorInterface{
      * Stop the fee collector service and clean up resources
      */
     public stop(): void {
-        
+        if(!this.setup_complete){
+            throw new Error('Fee collector setup not complete');
+        }
     }
 }
