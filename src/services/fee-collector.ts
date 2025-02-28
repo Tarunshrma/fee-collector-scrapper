@@ -2,14 +2,9 @@ import {ChainConfig, ParsedFeeCollectedEvents, RawEventLogs} from '../types/type
 import FeeCollectorInterface from './interfaces/fee-collector-interface';
 import logger from '../utils/logger';
 import EventEmitter from 'node:events';
-import fs from 'fs';
-import path from 'path';
-import { Constants } from '../utils/constants';
 import Web3AdapterInterface from './interfaces/web3-adapter-interface';
 import { LiveFeeCollector } from './live-fee-collector';
-
-
-const DATA_LOGS_PATH = path.join("./", 'data');
+import { HistoricalFeeCollector } from './historical-fee-collector';
 
 /**
  * FeeCollector class
@@ -22,13 +17,14 @@ export class FeeCollector implements FeeCollectorInterface{
     private setup_complete: boolean = false;
 
     private liveFeeCollector:LiveFeeCollector;
+    private historicalFeeCollector:HistoricalFeeCollector;
 
     constructor(private config: ChainConfig,
         private eventEmitter: EventEmitter,
         private web3AdapterInterface:Web3AdapterInterface<RawEventLogs, ParsedFeeCollectedEvents>){
-        this.config = config;
 
         this.liveFeeCollector = new LiveFeeCollector(this.config, this.eventEmitter, this.web3AdapterInterface)
+        this.historicalFeeCollector = new HistoricalFeeCollector(this.config, this.eventEmitter, this.web3AdapterInterface)
     }
 
     public async setup(): Promise<void>{
@@ -40,10 +36,6 @@ export class FeeCollector implements FeeCollectorInterface{
             this.backwardCursor = current_block;
             this.forwardCursor = current_block + 1;
 
-            if (!fs.existsSync(DATA_LOGS_PATH)) {
-                fs.mkdirSync(DATA_LOGS_PATH, { recursive: true });
-            }
-
             this.setup_complete = true;
         }catch(error){
             logger.error(`Error setting up fee collector: ${error}`)
@@ -54,11 +46,12 @@ export class FeeCollector implements FeeCollectorInterface{
         if(!this.setup_complete){
             throw new Error('Fee collector setup not complete');
         }
-        //<------- backward cursor
-        //await this.fetchHistoricalBlocks()
-
-        //foward cursor ------->
-        await this.fetchLiveBlocks()
+        await Promise.all(
+            [
+                this.fetchHistoricalBlocks(),
+                this.fetchLiveBlocks()
+            ]
+        )
     }
 
 
@@ -88,45 +81,13 @@ export class FeeCollector implements FeeCollectorInterface{
             if(!this.setup_complete){
                 throw new Error('Fee collector setup not complete');
             }
-
-            //fetch events from the blockchain until the seed block
-            while(this.backwardCursor > this.config.start_block){
-                //fetch events in batches
-                const start_block = this.backwardCursor - this.config.block_batch_size;
-
-                //fetch events from the blockchain
-                const rawEvents = await this.web3AdapterInterface.fetchRawFeesCollectedEvents(start_block, this.backwardCursor) as RawEventLogs[]
-                
-                //if events are found, parse and save them
-                if(rawEvents.length > 0){
-                    this.saveParsedEvents(start_block.toString(), rawEvents)
-                }
-                
-                //update the backward cursor
-                this.backwardCursor = start_block;
-            }
+            this.historicalFeeCollector.start(this.backwardCursor)
         }catch(error){
             logger.error(`[fetchHistoricalBlocks]: Error fetching historical blocks: ${error}`)
             throw error
         }
     }
-
-    /**
-    * Save parsed events to a file
-    * @param fromBlock
-    */
-    private async  saveParsedEvents (fromBlock: string,rawEvents : RawEventLogs[]): Promise<void> {
-        try{
-            const filePath = path.join(DATA_LOGS_PATH, `${fromBlock}.json`);
-            const writerStream = fs.createWriteStream(filePath)
-            const parsedEvents = await this.web3AdapterInterface.parseRawBlocks(rawEvents)
-            writerStream.end(JSON.stringify(parsedEvents))
-            this.eventEmitter.emit(Constants.EVENT_BLOCKS_SAVED, filePath);
-        }catch(error){
-            logger.error(`[saveParsedEvents]: Error saving parsed events: ${error}`)
-            throw error
-        }
-    } 
+    
 
     //TODO: Implement stop method
     /**
@@ -136,5 +97,9 @@ export class FeeCollector implements FeeCollectorInterface{
         if(!this.setup_complete){
             throw new Error('Fee collector setup not complete');
         }
+
+        logger.info('Stopping fee collector service')
+        this.historicalFeeCollector.stop();
+        this.liveFeeCollector.stop();
     }
 }

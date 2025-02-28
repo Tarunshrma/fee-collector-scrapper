@@ -31,7 +31,7 @@ const server = app.listen(PORT, () => {
 });
   
 
-
+let feeCollector: FeeCollector;
 async function start() {
     try {
         const eventEmitter = new EventEmitter();
@@ -42,7 +42,7 @@ async function start() {
         logger.info(`Service started for chain: ${process.env.CHAIN_ID!}`);
 
         const etherJSFeeCollector = new EtherJSFeesCollectorAdapter<RawEventLogs,ParsedFeeCollectedEvents>(chainConfig);
-        const feeCollector = new FeeCollector(chainConfig,eventEmitter,etherJSFeeCollector);
+        feeCollector = new FeeCollector(chainConfig,eventEmitter,etherJSFeeCollector);
         
         await feeCollector.setup();
         await feeCollector.fetchFees();
@@ -55,15 +55,16 @@ async function start() {
   async function stop() {
     try {
       //Close all dependencies
+      feeCollector.stop();
       logger.info('Service stopped');
     } catch (error) {
       logger.error(`Error stopping service: ${error}`);
     }
   }
 
-process.on('SIGTERM', () => {
+process.on('SIGTERM', async () => {
     logger.info('SIGTERM signal received: closing HTTP server')
-    stop()
+    await stop()
     server.close(() => {
         logger.info('HTTP server closed')
     })

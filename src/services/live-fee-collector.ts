@@ -1,4 +1,5 @@
 import { RawEventLogs } from "../types/types";
+import logger from "../utils/logger";
 import { BaseFeeCollector } from "./base-fee-collector";
 
 //TODO: Move it to somewhere else
@@ -10,8 +11,7 @@ const UPDATE_INTERVAL = 1000 * 5; // Every 5 seconds
 export class LiveFeeCollector extends BaseFeeCollector{
    
     private fetchHandle: NodeJS.Timeout | null = null;
-    private cursor: number = -1;
-
+ 
     constructor(protected config: any, 
                     protected eventEmitter: any, 
                     protected web3AdapterInterface: any){
@@ -27,7 +27,7 @@ export class LiveFeeCollector extends BaseFeeCollector{
     /**
      * Fetch live fees from target blockchain
      */
-    public async fetchLiveFees(): Promise<void>{
+    private async fetchLiveFees(): Promise<void>{
         try{
             if (this.cursor === -1) {
                 throw new Error('Cursor not set');
@@ -59,6 +59,8 @@ export class LiveFeeCollector extends BaseFeeCollector{
      * Stop the fee service and clean up resources
      */
     public stop(): void {
+        logger.info('Stopping live fee collector service')
         if (this.fetchHandle !== null) clearInterval(this.fetchHandle);
+
     }
 }

@@ -3,12 +3,12 @@ import logger from "../utils/logger"
 import { RawEventLogs } from "../types/types"
 
 export abstract class BaseFeeCollector {
-  constructor(protected config: any, protected eventEmitter: any, protected web3AdapterInterface: any) {
-
-  } 
+    protected cursor: number = -1;
+    
+    constructor(protected config: any, protected eventEmitter: any, protected web3AdapterInterface: any) {} 
 
     protected async collectFee(from: number, to: number): Promise<void>{
-    try{
+        try{
             //fetch events from the blockchain
             const rawEvents = await this.web3AdapterInterface.fetchRawFeesCollectedEvents(from, to) as RawEventLogs[]
                 
@@ -18,10 +18,10 @@ export abstract class BaseFeeCollector {
             }else{
                 logger.debug(`No fees collected from block ${from} to ${to}`)
             }
-    }catch(error){
-        logger.error(`Error setting up fee collector: ${error}`)
-        throw error
-    }
+        }catch(error){
+            logger.error(`Error setting up fee collector: ${error}`)
+            throw error
+        }
     }
 
     /**
@@ -30,4 +30,15 @@ export abstract class BaseFeeCollector {
      * @param rawEvents 
      */
     protected abstract saveParsedEvents(startBlock: string, rawEvents: RawEventLogs[]): void
+
+    /**
+     * 
+     * @param cursor Start the fee service
+     */
+    public abstract start(cursor:number): void
+
+    /**
+     * Stop the fee service and clean up resources
+     */
+    public abstract stop(): void
 }
