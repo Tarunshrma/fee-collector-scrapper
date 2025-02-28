@@ -6,7 +6,7 @@ import logger_middleware from './middleware/logger';
 import logger from './utils/logger';
 import { FeeCollector } from './services/fee-collector';
 import { ChainConfig, ParsedFeeCollectedEvents, RawEventLogs } from './types/types';
-import { StoreFeeData } from './services/store-fee-data';
+import { ProcessHistoricalFeeData } from './services/process-historical-fee-data';
 import EventEmitter from 'node:events';
 import { EtherJSFeesCollectorAdapter } from './services/etherjs-web3-adapter';
 
@@ -35,7 +35,7 @@ const server = app.listen(PORT, () => {
 async function start() {
     try {
         const eventEmitter = new EventEmitter();
-        new StoreFeeData(eventEmitter)
+        new ProcessHistoricalFeeData(eventEmitter)
 
         //Initialize all dependencies
         const chainConfig:ChainConfig = config.get(process.env.CHAIN_ID!) as ChainConfig;

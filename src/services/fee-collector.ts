@@ -6,6 +6,7 @@ import fs from 'fs';
 import path from 'path';
 import { Constants } from '../utils/constants';
 import Web3AdapterInterface from './interfaces/web3-adapter-interface';
+import { LiveFeeCollector } from './live-fee-collector';
 
 
 const DATA_LOGS_PATH = path.join("./", 'data');
@@ -20,10 +21,14 @@ export class FeeCollector implements FeeCollectorInterface{
 
     private setup_complete: boolean = false;
 
+    private liveFeeCollector:LiveFeeCollector;
+
     constructor(private config: ChainConfig,
         private eventEmitter: EventEmitter,
         private web3AdapterInterface:Web3AdapterInterface<RawEventLogs, ParsedFeeCollectedEvents>){
         this.config = config;
+
+        this.liveFeeCollector = new LiveFeeCollector(this.config, this.eventEmitter, this.web3AdapterInterface)
     }
 
     public async setup(): Promise<void>{
@@ -50,7 +55,28 @@ export class FeeCollector implements FeeCollectorInterface{
             throw new Error('Fee collector setup not complete');
         }
         //<------- backward cursor
-        await this.fetchHistoricalBlocks()
+        //await this.fetchHistoricalBlocks()
+
+        //foward cursor ------->
+        await this.fetchLiveBlocks()
+    }
+
+
+    /**
+     * Fetch live blocks from target blockchain
+    */
+    private async fetchLiveBlocks(): Promise<void>{
+        try{
+            if(!this.setup_complete){
+                throw new Error('Fee collector setup not complete');
+            }
+            
+            this.liveFeeCollector.start(this.forwardCursor)
+
+        }catch(error){
+            logger.error(`[fetchLiveBlocks]: Error fetching live blocks: ${error}`)
+            throw error
+        }
     }
 
     /**

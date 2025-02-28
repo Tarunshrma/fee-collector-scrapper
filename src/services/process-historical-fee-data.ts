@@ -15,7 +15,7 @@ const BACKUP_DATA_PATH = path.join("./", 'backup');
 
 const UPDATE_INTERVAL = 1000 * 1; // Every 5 seconds
 
-export class StoreFeeData {
+export class ProcessHistoricalFeeData {
 
     private pendingOperations:string[] = []
     private fetchHandle: NodeJS.Timeout | null = null;
