@@ -14,6 +14,8 @@ import { container } from 'tsyringe';
 import { CacheInterface } from './services/interfaces/cahce-inerface';
 import { RedisClient } from './services/redis-client';
 import { Constants } from './utils/constants';
+import { FeeRepositoryInterface } from './services/interfaces/fee-repository-interface';
+import { FeeMongoDBRepository } from './services/fee-mongodb-repository';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -42,16 +44,21 @@ const server = app.listen(PORT, () => {
   
 
 let feeCollector: FeeCollector;
+let cache: CacheInterface;
+let feeRepository: FeeRepositoryInterface;
+
 async function start() {
     try {
         //Register all dependencies
         registerDependencies()
 
-        // Resolve the cache using the interface token.
-        const cache = container.resolve<CacheInterface>('CacheInterface');
-
-        // Connect using your Redis URL (adjust as necessary)
+        // Resolve the cache using the interface token and connect.
+        cache = container.resolve<CacheInterface>('CacheInterface');
         await cache.connect(process.env.REDIS_URL!);
+
+        // Resolve the fee repository using the interface token and connect.
+        feeRepository = container.resolve<FeeRepositoryInterface>('FeeRepositoryInterface');
+        await feeRepository.connect();
 
         const eventEmitter = new EventEmitter();
         new ProcessHistoricalFeeData(eventEmitter)
@@ -73,12 +80,16 @@ async function start() {
 
   async function registerDependencies() {
       container.registerSingleton<CacheInterface>('CacheInterface', RedisClient);
+      container.registerSingleton<FeeRepositoryInterface>('FeeRepositoryInterface', FeeMongoDBRepository);
   }
   
   async function stop() {
     try {
       //Close all dependencies
       feeCollector.stop();
+      feeRepository.disconnect();
+      cache.disconnect();
+
       logger.info('Service stopped');
     } catch (error) {
       logger.error(`Error stopping service: ${error}`);
