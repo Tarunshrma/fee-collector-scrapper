@@ -43,13 +43,14 @@ export class HistoricalFeeCollector extends BaseFeeCollector {
                 //fetch events in batches
                 const start_block = this.cursor - this.config.block_batch_size;
 
-                //fetch events from the blockchain
-                const rawEvents = await this.web3AdapterInterface.fetchRawFeesCollectedEvents(start_block, this.cursor) as RawEventLogs[]
+                // //fetch events from the blockchain
+                // const rawEvents = await this.web3AdapterInterface.fetchRawFeesCollectedEvents(start_block, this.cursor) as RawEventLogs[]
                 
-                //if events are found, parse and save them
-                if(rawEvents.length > 0){
-                    this.saveParsedEvents(start_block.toString(), rawEvents)
-                }
+                // //if events are found, parse and save them
+                // if(rawEvents.length > 0){
+                //     this.saveParsedEvents(start_block.toString(), rawEvents)
+                // }
+                this.collectFee(start_block, this.cursor)
                 
                 //update the backward cursor
                 this.cursor = start_block;

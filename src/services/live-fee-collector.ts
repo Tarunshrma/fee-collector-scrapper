@@ -38,6 +38,10 @@ export class LiveFeeCollector extends BaseFeeCollector{
 
             //Get live block number
             const latestBlock = await this.web3AdapterInterface.getLatestBlockNumber()
+            if (latestBlock < this.cursor) {
+                logger.info('No new blocks found')
+                return
+            }
 
             console.log(`Fetching live fees from ${this.cursor} to ${latestBlock}`)
             //fetch live blocks from the blockchain

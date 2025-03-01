@@ -15,7 +15,7 @@ export abstract class BaseFeeCollector {
             //if events are found, parse and save them
             this.saveParsedEvents(from.toString(), rawEvents)
         }catch(error){
-            logger.error(`Error setting up fee collector: ${error}`)
+            logger.error(`[collectFee]: Error setting up fee collector: ${error}`)
             throw error
         }
     }
