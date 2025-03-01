@@ -1,9 +1,11 @@
+import { container } from "tsyringe";
 import { RawEventLogs } from "../types/types";
 import { Constants } from "../utils/constants";
 import logger from "../utils/logger";
 import { BaseFeeCollector } from "./base-fee-collector";
 import fs from 'fs';
 import path from 'path';
+import { CacheInterface } from "./interfaces/cahce-inerface";
 
 //TODO: Move it to somewhere else
 const DATA_LOGS_PATH = path.join("./", 'data');
@@ -66,9 +68,16 @@ export class HistoricalFeeCollector extends BaseFeeCollector {
         try{
             const filePath = path.join(DATA_LOGS_PATH, `${startBlock}.json`);
             const writerStream = fs.createWriteStream(filePath)
-            const parsedEvents = await this.web3AdapterInterface.parseRawBlocks(rawEvents)
-            writerStream.end(JSON.stringify(parsedEvents))
-            this.eventEmitter.emit(Constants.EVENT_BLOCKS_SAVED, filePath);
+
+            //save the parsed events to a file
+            if(rawEvents.length > 0){
+                const parsedEvents = await this.web3AdapterInterface.parseRawBlocks(rawEvents)
+                writerStream.end(JSON.stringify(parsedEvents))
+                this.eventEmitter.emit(Constants.EVENT_BLOCKS_SAVED, filePath);
+            }
+            //save the backward cursor in cache
+            const cache = container.resolve<CacheInterface>('CacheInterface');
+            await cache.setValue(Constants.BACKWARD_CURSOR_REDIS_KEY,startBlock);
         }catch(error){
             logger.error(`[saveParsedEvents]: Error saving parsed events: ${error}`)
             throw error

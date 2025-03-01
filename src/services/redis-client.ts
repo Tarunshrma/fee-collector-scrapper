@@ -77,7 +77,7 @@ export class RedisClient implements CacheInterface{
      * @param key 
      * @returns 
      */
-    public async getValue(key:string){
+    public async getValue(key:string):Promise<string>{
         try{
             const value = await this.redisClient.get(key);
             return value;

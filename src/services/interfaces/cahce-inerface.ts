@@ -26,5 +26,5 @@ export interface CacheInterface{
      * Get value from cache
      * @param key 
      */
-    getValue(key:string): Promise<void>
+    getValue(key:string): Promise<string>
 }

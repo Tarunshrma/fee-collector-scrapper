@@ -13,11 +13,7 @@ export abstract class BaseFeeCollector {
             const rawEvents = await this.web3AdapterInterface.fetchRawFeesCollectedEvents(from, to) as RawEventLogs[]
                 
             //if events are found, parse and save them
-            if(rawEvents.length > 0){
-                this.saveParsedEvents(from.toString(), rawEvents)
-            }else{
-                logger.debug(`No fees collected from block ${from} to ${to}`)
-            }
+            this.saveParsedEvents(from.toString(), rawEvents)
         }catch(error){
             logger.error(`Error setting up fee collector: ${error}`)
             throw error

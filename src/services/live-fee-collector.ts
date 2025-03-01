@@ -1,6 +1,9 @@
+import { container } from "tsyringe";
 import { RawEventLogs } from "../types/types";
 import logger from "../utils/logger";
 import { BaseFeeCollector } from "./base-fee-collector";
+import { CacheInterface } from "./interfaces/cahce-inerface";
+import { Constants } from "../utils/constants";
 
 //TODO: Move it to somewhere else
 const UPDATE_INTERVAL = 1000 * 5; // Every 5 seconds
@@ -53,6 +56,10 @@ export class LiveFeeCollector extends BaseFeeCollector{
     protected async saveParsedEvents(startBlock: string, rawEvents: RawEventLogs[]): Promise<void> {
         const parsedEvents = await this.web3AdapterInterface.parseRawBlocks(rawEvents)
         console.log(parsedEvents)
+
+        //TODO: Save the parsed events to a database and then store the cursor in cache
+        const cache = container.resolve<CacheInterface>('CacheInterface');
+        await cache.setValue(Constants.FORWARD_CURSOR_REDIS_KEY,startBlock);
     }
 
     /**

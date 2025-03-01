@@ -13,6 +13,7 @@ import { EtherJSFeesCollectorAdapter } from './services/etherjs-web3-adapter';
 import { container } from 'tsyringe';
 import { CacheInterface } from './services/interfaces/cahce-inerface';
 import { RedisClient } from './services/redis-client';
+import { Constants } from './utils/constants';
 
 const app = express();
 const PORT = process.env.PORT || 3000;

@@ -5,6 +5,9 @@ import EventEmitter from 'node:events';
 import Web3AdapterInterface from './interfaces/web3-adapter-interface';
 import { LiveFeeCollector } from './live-fee-collector';
 import { HistoricalFeeCollector } from './historical-fee-collector';
+import { Constants } from '../utils/constants';
+import { container } from 'tsyringe';
+import { CacheInterface } from './interfaces/cahce-inerface';
 
 /**
  * FeeCollector class
@@ -32,9 +35,26 @@ export class FeeCollector implements FeeCollectorInterface{
             //
             //TODO: Implement redis cache & Load the forward and backward cursors from redis cache
             //WORKAROUND: Setting up cursors to start from the current block
-            const current_block = await this.web3AdapterInterface.getLatestBlockNumber();
-            this.backwardCursor = current_block;
-            this.forwardCursor = current_block + 1;
+            const cache = container.resolve<CacheInterface>('CacheInterface');
+            
+            const forward_cursor = await cache.getValue(Constants.FORWARD_CURSOR_REDIS_KEY);
+            const backward_cursor = await cache.getValue(Constants.BACKWARD_CURSOR_REDIS_KEY);
+    
+            if (forward_cursor == null && 
+                    backward_cursor == null) {
+
+                logger.info('No cursors found in cache, this might be the first run of the service');
+                
+                const current_block = await this.web3AdapterInterface.getLatestBlockNumber();
+                this.backwardCursor = current_block;
+                this.forwardCursor = current_block + 1;
+            }else{
+                this.backwardCursor = parseInt(backward_cursor);
+                this.forwardCursor = parseInt(forward_cursor);
+            }
+
+            console.log('Forward cursor:', this.forwardCursor);
+            console.log('Backward cursor:', this.backwardCursor);
 
             this.setup_complete = true;
         }catch(error){
