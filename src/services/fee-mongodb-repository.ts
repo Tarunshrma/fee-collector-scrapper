@@ -10,12 +10,7 @@ import { CollectedFeeModel } from "../models/collected-fee";
  * This class is concrete implementation of FeeRepositoryInterface for MongoDB
  */
 export class FeeMongoDBRepository implements FeeRepositoryInterface {
-    
-    // MONGODB_URL=mongodb://localhost:27017
-    // MONGODB_DB=mainnet
-    // MONGODB_COLLECTION=collected-fee
-    // MONGODB_USER=
-    // MONGODB_PASS=
+
 
     /**
      * connect to the database
@@ -32,11 +27,11 @@ export class FeeMongoDBRepository implements FeeRepositoryInterface {
                 throw new Error('MongoDB URL or DB name is not provided')
             }
 
-            if (user_name && password){
-                await mongoose.connect(`mongodb://${user_name}:${password}@${host}/${db}`);
-            }else{
+            // if (user_name && password){
+            //     await mongoose.connect(`mongodb://${user_name}:${password}@${host}/${db}`);
+            // }else{
                 await mongoose.connect(`mongodb://${host}/${db}`);
-            }
+            //}
         }catch(err){
             logger.error(`Error connecting to MongoDB: ${err}`)
             throw err
@@ -62,16 +57,14 @@ export class FeeMongoDBRepository implements FeeRepositoryInterface {
      */
     public async storeFee(fees: ParsedFeeCollectedEvents[]): Promise<boolean> {
         try{
-            for (const fee of fees){
-                await CollectedFeeModel.create([
-                    {
-                        token: fee.token,
-                        integrator: fee.integrator,
-                        integratorFee: fee.integratorFee.toString(), //TODO: optimize this
-                        lifiFee: fee.lifiFee.toString(), //TODO: optimize this
-                    }
-                  ])
-            }
+            await CollectedFeeModel.insertMany(
+                fees.map((fee) => ({
+                  token: fee.token,
+                  integrator: fee.integrator,
+                  integratorFee: fee.integratorFee.toString(),
+                  lifiFee: fee.lifiFee.toString(),
+                }))
+              );
             return true
         }catch(err){
             throw err

@@ -67,9 +67,6 @@ export class HistoricalFeeCollector extends BaseFeeCollector {
             writerStream.end(JSON.stringify(parsedEvents))
             this.eventEmitter.emit(Constants.EVENT_BLOCKS_SAVED, filePath);
             // }
-            //save the backward cursor in cache
-            const cache = container.resolve<CacheInterface>('CacheInterface');
-            await cache.setValue(Constants.BACKWARD_CURSOR_REDIS_KEY,startBlock);
         }catch(error){
             logger.error(`[saveParsedEvents]: Error saving parsed events: ${error}`)
             throw error

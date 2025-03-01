@@ -1,11 +1,16 @@
 import { promises } from "dns"
 import logger from "../utils/logger"
 import { RawEventLogs } from "../types/types"
+import { FeeRepositoryInterface } from "./interfaces/fee-repository-interface";
+import { container } from "tsyringe";
 
 export abstract class BaseFeeCollector {
     protected cursor: number = -1;
+    protected feeRepository: FeeRepositoryInterface; 
     
-    constructor(protected config: any, protected eventEmitter: any, protected web3AdapterInterface: any) {} 
+    constructor(protected config: any, protected eventEmitter: any, protected web3AdapterInterface: any) {
+        this.feeRepository = container.resolve<FeeRepositoryInterface>('FeeRepositoryInterface');
+    } 
 
     protected async collectFee(from: number, to: number): Promise<void>{
         try{

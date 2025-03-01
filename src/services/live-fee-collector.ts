@@ -14,7 +14,7 @@ const UPDATE_INTERVAL = 1000 * 5; // Every 5 seconds
 export class LiveFeeCollector extends BaseFeeCollector{
    
     private fetchHandle: NodeJS.Timeout | null = null;
- 
+    
     constructor(protected config: any, 
                     protected eventEmitter: any, 
                     protected web3AdapterInterface: any){
@@ -58,12 +58,19 @@ export class LiveFeeCollector extends BaseFeeCollector{
      * @param rawEvents 
      */
     protected async saveParsedEvents(startBlock: string, rawEvents: RawEventLogs[]): Promise<void> {
-        const parsedEvents = await this.web3AdapterInterface.parseRawBlocks(rawEvents)
-        console.log(parsedEvents)
-
-        //TODO: Save the parsed events to a database and then store the cursor in cache
-        const cache = container.resolve<CacheInterface>('CacheInterface');
-        await cache.setValue(Constants.FORWARD_CURSOR_REDIS_KEY,startBlock);
+        try{
+            const parsedEvents = await this.web3AdapterInterface.parseRawBlocks(rawEvents)
+        
+            //Save the parsed events to a database and then store the cursor in cache
+            await this.feeRepository.storeFee(parsedEvents)
+            
+            //TODO: Save the parsed events to a database and then store the cursor in cache
+            const cache = container.resolve<CacheInterface>('CacheInterface');
+            await cache.setValue(Constants.FORWARD_CURSOR_REDIS_KEY,startBlock);
+    
+        }catch(error){
+            throw error
+        }
     }
 
     /**

@@ -5,6 +5,6 @@
             "rpc_url":"https://polygon-rpc.com",
             "secondary_rpc_url":"",
             "start_block": 61500000,
-            "block_batch_size":1000
+            "block_batch_size":10000
         }
 }
