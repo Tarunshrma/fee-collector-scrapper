@@ -49,8 +49,9 @@ export class FeeCollector implements FeeCollectorInterface{
                 this.backwardCursor = current_block;
                 this.forwardCursor = current_block + 1;
             }else{
-                this.backwardCursor = parseInt(backward_cursor);
-                this.forwardCursor = parseInt(forward_cursor);
+                //Load the cursors from cache
+                this.backwardCursor = parseInt(backward_cursor) - 1;
+                this.forwardCursor = parseInt(forward_cursor) + 1;
             }
 
             console.log('Forward cursor:', this.forwardCursor);

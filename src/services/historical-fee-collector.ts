@@ -38,8 +38,6 @@ export class HistoricalFeeCollector extends BaseFeeCollector {
                 throw new Error('Cursor not set');
             }
 
-            console.log(`Fetching historical fees from ${this.config.start_block} to ${this.cursor}`)
-
             //fetch events from the blockchain until the seed block
             while(this.cursor > this.config.start_block){
                 //fetch events in batches
