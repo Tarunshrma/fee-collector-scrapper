@@ -38,20 +38,13 @@ export class HistoricalFeeCollector extends BaseFeeCollector {
                 throw new Error('Cursor not set');
             }
 
+            console.log(`Fetching historical fees from ${this.config.start_block} to ${this.cursor}`)
+
             //fetch events from the blockchain until the seed block
             while(this.cursor > this.config.start_block){
                 //fetch events in batches
                 const start_block = this.cursor - this.config.block_batch_size;
-
-                // //fetch events from the blockchain
-                // const rawEvents = await this.web3AdapterInterface.fetchRawFeesCollectedEvents(start_block, this.cursor) as RawEventLogs[]
-                
-                // //if events are found, parse and save them
-                // if(rawEvents.length > 0){
-                //     this.saveParsedEvents(start_block.toString(), rawEvents)
-                // }
-                this.collectFee(start_block, this.cursor)
-                
+                await this.collectFee(start_block, this.cursor)
                 //update the backward cursor
                 this.cursor = start_block;
             }
@@ -71,11 +64,11 @@ export class HistoricalFeeCollector extends BaseFeeCollector {
             const writerStream = fs.createWriteStream(filePath)
 
             //save the parsed events to a file
-            if(rawEvents.length > 0){
-                const parsedEvents = await this.web3AdapterInterface.parseRawBlocks(rawEvents)
-                writerStream.end(JSON.stringify(parsedEvents))
-                this.eventEmitter.emit(Constants.EVENT_BLOCKS_SAVED, filePath);
-            }
+            // if(rawEvents.length > 0){
+            const parsedEvents = await this.web3AdapterInterface.parseRawBlocks(rawEvents)
+            writerStream.end(JSON.stringify(parsedEvents))
+            this.eventEmitter.emit(Constants.EVENT_BLOCKS_SAVED, filePath);
+            // }
             //save the backward cursor in cache
             const cache = container.resolve<CacheInterface>('CacheInterface');
             await cache.setValue(Constants.BACKWARD_CURSOR_REDIS_KEY,startBlock);
