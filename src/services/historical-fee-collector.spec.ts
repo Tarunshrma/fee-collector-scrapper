@@ -3,7 +3,7 @@ import { MockFeesCollectorAdapter } from '../test-helpers/mock-fee-collector';
 import { HistoricalFeeCollector } from './historical-fee-collector';
 
 
-describe('FeeCollector', () => {
+describe('HistoricalFeeCollector', () => {
     let mockFeeCollectorAdapter: MockFeesCollectorAdapter;
     let historyFeeCollector: HistoricalFeeCollector;
 
