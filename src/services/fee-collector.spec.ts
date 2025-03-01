@@ -1,27 +1,10 @@
 // fee-collector.spec.ts
 import EventEmitter from 'node:events';
 import { FeeCollector } from './fee-collector';
-import { EtherJSFeesCollectorAdapter } from './etherjs-web3-adapter';
-import Web3AdapterInterface from './interfaces/web3-adapter-interface';
-import { ChainConfig, ParsedFeeCollectedEvents, RawEventLogs } from '../types/types';
-
-// Mocking the Web3AdapterInterface
-class MockFeesCollectorAdapter implements Web3AdapterInterface<RawEventLogs, ParsedFeeCollectedEvents>{
-  constructor(private feeCollectorconfig: ChainConfig){}
-
-  public async fetchRawFeesCollectedEvents(from:number ,to :number): Promise<RawEventLogs[]>{
-      return [];
-  }
-
-  public async parseRawBlocks(rawBlocksEvent:RawEventLogs[]): Promise<ParsedFeeCollectedEvents[]>{
-      return []
-  }
-
-  public async getLatestBlockNumber(): Promise<number> {
-      return 0;
-  }
-} 
-
+// import { EtherJSFeesCollectorAdapter } from './etherjs-web3-adapter';
+// import Web3AdapterInterface from './interfaces/web3-adapter-interface';
+// import { ChainConfig, ParsedFeeCollectedEvents, RawEventLogs } from '../types/types';
+import { MockFeesCollectorAdapter } from '../test-helpers/mock-fee-collector';
 
 describe('FeeCollector', () => {
 
@@ -54,12 +37,14 @@ describe('FeeCollector', () => {
     
     //Setup
     const fetchHistoricalBlocksSpy = jest.spyOn(feeCollector as any, 'fetchHistoricalBlocks');
+    const fetchLiveBlocksSpy = jest.spyOn(feeCollector as any, 'fetchLiveBlocks');
     
     await feeCollector.setup();
     await feeCollector.fetchFees();
     
     //Expectations
     expect(fetchHistoricalBlocksSpy).toHaveBeenCalled();
+    expect(fetchLiveBlocksSpy).toHaveBeenCalled();
   });
 
   //FIXME: This test is not working as expected

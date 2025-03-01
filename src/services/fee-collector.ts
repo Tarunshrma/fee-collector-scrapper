@@ -42,6 +42,9 @@ export class FeeCollector implements FeeCollectorInterface{
         }
     }
     
+    /**
+     * Fetch fees from target blockchain
+     */
     public async fetchFees(): Promise<void>{
         if(!this.setup_complete){
             throw new Error('Fee collector setup not complete');
@@ -97,7 +100,6 @@ export class FeeCollector implements FeeCollectorInterface{
         if(!this.setup_complete){
             throw new Error('Fee collector setup not complete');
         }
-
         logger.info('Stopping fee collector service')
         this.historicalFeeCollector.stop();
         this.liveFeeCollector.stop();
