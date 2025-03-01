@@ -13,17 +13,21 @@ import { container } from "tsyringe";
 import { CacheInterface } from "./interfaces/cahce-inerface";
 
 const BACKUP_DATA_PATH = path.join("./", 'backup');
+const DATA_LOGS_PATH = path.join("./", 'data');
 
-const UPDATE_INTERVAL = 1000 * 1; // Every 5 seconds
+const UPDATE_INTERVAL = 1000 * 2; // Every 2 seconds
 
 export class ProcessHistoricalFeeData {
 
     private pendingOperations:string[] = []
     private fetchHandle: NodeJS.Timeout | null = null;
     private feeRepository: FeeRepositoryInterface;
+    private cache: CacheInterface;
 
     constructor(private eventEmitter: EventEmitter){
         this.feeRepository = container.resolve<FeeRepositoryInterface>('FeeRepositoryInterface');
+        this.cache = container.resolve<CacheInterface>('CacheInterface');
+
         this.subscribeEvents()
     }
 
@@ -50,7 +54,10 @@ export class ProcessHistoricalFeeData {
      */
     private async processPendingOperations(){
         if(this.pendingOperations.length > 0){
-            const filePath = this.pendingOperations.pop();
+            
+            const block_number = this.pendingOperations.pop();
+            const filePath = path.join(DATA_LOGS_PATH, `${block_number}.json`);
+
             if (filePath === undefined) return;
 
             const readerStream = fs.createReadStream(filePath,'utf8')
@@ -64,12 +71,18 @@ export class ProcessHistoricalFeeData {
 
             readerStream.on('close', async () => {
                 // delete the file
-                let data = JSON.parse(parsed_data)
+                let data = []
+                try{
+                    data = JSON.parse(parsed_data)
+                }catch(e){
+                    logger.error(`error parsing json ${filePath} adding back to process queue to retry`, e)
+                    this.pendingOperations.push(block_number!)
+                    return
+                }
+                
                 await this.feeRepository.storeFee(data)   
-
                 //save the backward cursor in cache
-                const cache = container.resolve<CacheInterface>('CacheInterface');
-                await cache.setValue(Constants.BACKWARD_CURSOR_REDIS_KEY,filePath);
+                await this.cache.setValue(Constants.BACKWARD_CURSOR_REDIS_KEY,block_number);
                 
                 logger.debug("data reading finished, move the file to backup, a seperate location like S3 bucket")
                 //TODO: For now we are moving the file to backup, in production we can move it to S3 bucket

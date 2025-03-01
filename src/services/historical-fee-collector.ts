@@ -65,7 +65,7 @@ export class HistoricalFeeCollector extends BaseFeeCollector {
             // if(rawEvents.length > 0){
             const parsedEvents = await this.web3AdapterInterface.parseRawBlocks(rawEvents)
             writerStream.end(JSON.stringify(parsedEvents))
-            this.eventEmitter.emit(Constants.EVENT_BLOCKS_SAVED, filePath);
+            this.eventEmitter.emit(Constants.EVENT_BLOCKS_SAVED, startBlock);
             // }
         }catch(error){
             logger.error(`[saveParsedEvents]: Error saving parsed events: ${error}`)
