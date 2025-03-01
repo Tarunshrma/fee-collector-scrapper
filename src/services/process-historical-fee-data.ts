@@ -7,10 +7,8 @@ import EventEmitter from "node:events";
 import { Constants } from "../utils/constants";
 import logger from "../utils/logger";
 import fs from 'fs';
-import { constants } from "node:buffer";
 import path from "node:path";
 
-const DATA_LOGS_PATH = path.join("./", 'data');
 const BACKUP_DATA_PATH = path.join("./", 'backup');
 
 const UPDATE_INTERVAL = 1000 * 1; // Every 5 seconds
