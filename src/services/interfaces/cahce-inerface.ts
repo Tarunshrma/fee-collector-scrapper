@@ -1,4 +1,4 @@
-interface CacheInterface{
+export interface CacheInterface{
     /**
      * Connect to cache
      */
@@ -8,11 +8,6 @@ interface CacheInterface{
      * Disconnect from cache
      */
     disconnect(): Promise<void>
-
-    /**
-     * Check if connected to cache
-     */
-    isConnected(): boolean
 
     /**
      * Set value in cache

@@ -2,6 +2,7 @@ version: '3'
 services:
   redis:
     image: redis:latest
+    command: ["redis-server", "--protected-mode", "no"]
     ports:
       - "6379:6379"
       - "15672:15672"

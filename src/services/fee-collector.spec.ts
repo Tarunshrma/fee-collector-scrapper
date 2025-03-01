@@ -1,9 +1,6 @@
 // fee-collector.spec.ts
 import EventEmitter from 'node:events';
 import { FeeCollector } from './fee-collector';
-// import { EtherJSFeesCollectorAdapter } from './etherjs-web3-adapter';
-// import Web3AdapterInterface from './interfaces/web3-adapter-interface';
-// import { ChainConfig, ParsedFeeCollectedEvents, RawEventLogs } from '../types/types';
 import { MockFeesCollectorAdapter } from '../test-helpers/mock-fee-collector';
 
 describe('FeeCollector', () => {
