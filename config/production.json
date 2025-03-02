@@ -1,10 +1,10 @@
 {
-    "137":[
+    "137":
         {
             "contract_address":"0xbD6C7B0d2f68c2b7805d88388319cfB6EcB50eA9",
             "rpc_url":"https://polygon-rpc.com",
             "secondary_rpc_url":"",
-            "start_block":"61500000"
+            "seed_block": 61500000,
+            "block_batch_size":10000
         }
-    ]
 }
