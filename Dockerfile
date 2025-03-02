@@ -14,4 +14,4 @@ RUN npm install
 COPY . .
 
 # RUN npm run build:skip-lint
-CMD [ "npm", "run", "dev" ]
+CMD [ "yarn", "start"]
