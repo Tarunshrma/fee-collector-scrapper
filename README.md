@@ -12,9 +12,13 @@ This project is a TypeScript-based tool designed to scrape the `FeesCollected` e
 
 ## Prerequisites
 
-- **Node.js** (v14 or later recommended)
+- **Node.js** (v20 or later recommended)
 - **MongoDB** instance (local or remote)
 - **Docker** and **Docker Compose**
+
+## High Level Design
+
+![High Level Design](./resources/high_level_design.png)
 
 ## Installation
 
