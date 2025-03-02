@@ -23,24 +23,6 @@ const PORT = process.env.PORT || 3000;
 
 app.use(logger_middleware);
 
-app.get('/api/', (req: Request, res: Response) => {
-    res.send("I am working");
-});
-  
-// Health endpoint that returns a simple status message
-app.get('/api/health', (req: Request, res: Response) => {
-    //TODO: Add additional health checkes like rpc reachablity, db reachability, etc.
-    res.json({ status: 'ok' });
-});
-
-// Readiness endpoint that returns a simple status message
-app.get('/api/ready', (req: Request, res: Response) => {
-  //TODO: Add additional health checkes like rpc reachablity, db reachability, etc.
-  res.json({ status: 'ok' });
-});
-
-
-
 const server = app.listen(PORT, () => {
     logger.info(`Server is running on http://localhost:${PORT}`);
 });
@@ -54,6 +36,9 @@ async function start() {
     try {
         //Register all dependencies
         registerDependencies()
+
+        //Register all routes
+        registerRouts()
 
         // Resolve the cache using the interface token and connect.
         cache = container.resolve<CacheInterface>('CacheInterface');
@@ -73,10 +58,6 @@ async function start() {
 
         const etherJSFeeCollector = new EtherJSFeesCollectorAdapter<RawEventLogs,ParsedFeeCollectedEvents>(chainConfig);
         feeCollector = new FeeCollector(chainConfig,eventEmitter,etherJSFeeCollector);
-        
-        //Initialize the fee router
-        const feeRouter = new FeeRouter();
-        app.use('/api', feeRouter.router);
 
         await feeCollector.setup();
         await feeCollector.fetchFees();
@@ -84,6 +65,30 @@ async function start() {
     } catch (error) {
       logger.error(`Error starting service: ${error}`);
     }
+  }
+
+  async function registerRouts() {
+
+    app.get('/api/', (req: Request, res: Response) => {
+        res.send("I am working");
+    });
+      
+    // Health endpoint that returns a simple status message
+    app.get('/api/health', (req: Request, res: Response) => {
+        //TODO: Add additional health checkes like rpc reachablity, db reachability, etc.
+        res.json({ status: 'ok' });
+    });
+    
+    // Readiness endpoint that returns a simple status message
+    app.get('/api/ready', (req: Request, res: Response) => {
+      //TODO: Add additional health checkes like rpc reachablity, db reachability, etc.
+      res.json({ status: 'ok' });
+    });
+
+    //Initialize the fee router
+    const feeRouter = new FeeRouter();
+    app.use('/api', feeRouter.router);
+
   }
 
   async function registerDependencies() {
