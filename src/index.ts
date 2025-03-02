@@ -37,7 +37,7 @@ async function start() {
         registerDependencies()
 
         //Register all routes
-        registerRouts()
+        registerRoutes()
 
         // Resolve the cache using the interface token and connect.
         cache = container.resolve<CacheInterface>('CacheInterface');
@@ -66,7 +66,7 @@ async function start() {
     }
   }
 
-  async function registerRouts() {
+  async function registerRoutes() {
 
     app.get('/api/', (req: Request, res: Response) => {
         res.send("I am working");
