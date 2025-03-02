@@ -83,8 +83,15 @@ export class FeeMongoDBRepository implements FeeRepositoryInterface {
      * Get fee from the database
      * @param integrator 
      */
-    getFee(integrator: string): Promise<ParsedFeeCollectedEvents[]> {
-        throw new Error("Method not implemented.");
+    public async getFee(integrator: string): Promise<ParsedFeeCollectedEvents[]> {
+        try{
+            const collected_fees = await CollectedFeeModel.find({
+                integrator,
+            }).exec()
+            return collected_fees;  
+        }catch(err){
+            throw err
+        }
     }
     
 }
