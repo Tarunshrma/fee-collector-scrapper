@@ -50,6 +50,11 @@ GET /api/v1/fee/<integrator-address>?page_index=0&page_size=10
 Retrieve all FeesCollected events associated with the specified integrator.
 - `page_index` starts from 0
 - `page_size` specifies the number of events per page
+
+## Future Improvements
+- Compress and upload the downloaded block data into external storage like S3
+- Autoswitch secondary url if primary url is exhausted with rate limit
+
 ## License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
 
