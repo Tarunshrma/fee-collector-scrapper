@@ -7,8 +7,6 @@ import fs from 'fs';
 import path from 'path';
 import { CacheInterface } from "./interfaces/cahce-inerface";
 
-//TODO: Move it to somewhere else
-const DATA_LOGS_PATH = path.join("./", 'data');
 
 export class HistoricalFeeCollector extends BaseFeeCollector {
     
@@ -21,8 +19,8 @@ export class HistoricalFeeCollector extends BaseFeeCollector {
     public async start(cursor: number): Promise<void> {
         this.cursor = cursor;
 
-        if (!fs.existsSync(DATA_LOGS_PATH)) {
-            fs.mkdirSync(DATA_LOGS_PATH, { recursive: true });
+        if (!fs.existsSync(Constants.DATA_LOGS_PATH)) {
+            fs.mkdirSync(Constants.DATA_LOGS_PATH, { recursive: true });
         }
 
         //fetch historical fees
@@ -58,7 +56,7 @@ export class HistoricalFeeCollector extends BaseFeeCollector {
     */
     protected async saveParsedEvents(startBlock: string, rawEvents: RawEventLogs[]): Promise<void> {
         try{
-            const filePath = path.join(DATA_LOGS_PATH, `${startBlock}.json`);
+            const filePath = path.join(Constants.DATA_LOGS_PATH, `${startBlock}.json`);
             const writerStream = fs.createWriteStream(filePath)
 
             //save the parsed events to a file

@@ -12,8 +12,6 @@ import { FeeRepositoryInterface } from "./interfaces/fee-repository-interface";
 import { container } from "tsyringe";
 import { CacheInterface } from "./interfaces/cahce-inerface";
 
-const BACKUP_DATA_PATH = path.join("./", 'backup');
-const DATA_LOGS_PATH = path.join("./", 'data');
 
 const UPDATE_INTERVAL = 1000 * 2; // Every 2 seconds
 
@@ -44,8 +42,8 @@ export class ProcessHistoricalFeeData {
         if (this.fetchHandle !== null) clearInterval(this.fetchHandle);
         this.fetchHandle = setInterval(this.processPendingOperations.bind(this), UPDATE_INTERVAL);
 
-        if (!fs.existsSync(BACKUP_DATA_PATH)) {
-            fs.mkdirSync(BACKUP_DATA_PATH, { recursive: true });
+        if (!fs.existsSync(Constants.BACKUP_DATA_PATH)) {
+            fs.mkdirSync(Constants.BACKUP_DATA_PATH, { recursive: true });
         }
     }
 
@@ -56,7 +54,7 @@ export class ProcessHistoricalFeeData {
         if(this.pendingOperations.length > 0){
             
             const block_number = this.pendingOperations.pop();
-            const filePath = path.join(DATA_LOGS_PATH, `${block_number}.json`);
+            const filePath = path.join(Constants.DATA_LOGS_PATH, `${block_number}.json`);
 
             if (filePath === undefined) return;
 
@@ -86,7 +84,7 @@ export class ProcessHistoricalFeeData {
                 
                 logger.debug("data reading finished, move the file to backup, a seperate location like S3 bucket")
                 //TODO: For now we are moving the file to backup, in production we can move it to S3 bucket
-                fs.rename(filePath, path.join(BACKUP_DATA_PATH, `backup-${path.basename(filePath)}`), (err) => {
+                fs.rename(filePath, path.join(Constants.BACKUP_DATA_PATH, `backup-${path.basename(filePath)}`), (err) => {
                     if (err) throw err;
                     logger.debug('File moved to backup');
                 });
