@@ -63,12 +63,13 @@ async function start() {
         feeRepository = container.resolve<FeeRepositoryInterface>('FeeRepositoryInterface');
         await feeRepository.connect();
 
-        const eventEmitter = new EventEmitter();
-        new ProcessHistoricalFeeData(eventEmitter)
-
         //Initialize all dependencies
         const chainConfig:ChainConfig = config.get(process.env.CHAIN_ID!) as ChainConfig;
         logger.info(`Service started for chain: ${process.env.CHAIN_ID!}`);
+        
+        const eventEmitter = new EventEmitter();
+        new ProcessHistoricalFeeData(eventEmitter,chainConfig)
+
 
         const etherJSFeeCollector = new EtherJSFeesCollectorAdapter<RawEventLogs,ParsedFeeCollectedEvents>(chainConfig);
         feeCollector = new FeeCollector(chainConfig,eventEmitter,etherJSFeeCollector);

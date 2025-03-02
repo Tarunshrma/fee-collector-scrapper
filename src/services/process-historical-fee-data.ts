@@ -11,9 +11,10 @@ import path from "node:path";
 import { FeeRepositoryInterface } from "./interfaces/fee-repository-interface";
 import { container } from "tsyringe";
 import { CacheInterface } from "./interfaces/cahce-inerface";
+import { ChainConfig } from "../types/types";
 
 
-const UPDATE_INTERVAL = 1000 * 2; // Every 2 seconds
+// const UPDATE_INTERVAL = 1000 * 2; // Every 2 seconds
 
 export class ProcessHistoricalFeeData {
 
@@ -21,11 +22,13 @@ export class ProcessHistoricalFeeData {
     private fetchHandle: NodeJS.Timeout | null = null;
     private feeRepository: FeeRepositoryInterface;
     private cache: CacheInterface;
+    private updateInterval:number;
 
-    constructor(private eventEmitter: EventEmitter){
+    constructor(private eventEmitter: EventEmitter, private chainConfig: ChainConfig){
         this.feeRepository = container.resolve<FeeRepositoryInterface>('FeeRepositoryInterface');
         this.cache = container.resolve<CacheInterface>('CacheInterface');
 
+        this.updateInterval = this.chainConfig.historical_fee_batch_insert_interval_in_seconds || Constants.HISTORICAL_BATCH_INSERT_INTERVAL_SEC;
         this.subscribeEvents()
     }
 
@@ -40,7 +43,7 @@ export class ProcessHistoricalFeeData {
         });
 
         if (this.fetchHandle !== null) clearInterval(this.fetchHandle);
-        this.fetchHandle = setInterval(this.processPendingOperations.bind(this), UPDATE_INTERVAL);
+        this.fetchHandle = setInterval(this.processPendingOperations.bind(this), this.updateInterval * 1000);
 
         if (!fs.existsSync(Constants.BACKUP_DATA_PATH)) {
             fs.mkdirSync(Constants.BACKUP_DATA_PATH, { recursive: true });

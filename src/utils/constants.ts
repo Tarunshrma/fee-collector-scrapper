@@ -5,7 +5,7 @@ export class Constants {
 
     public static readonly APP_NAME = "com.lifi.block-scrapper.fee-collector";
     public static readonly APP_VERSION = "0.0.1";
-    
+
     // Redis keys in format : package-name:version:chain-id:key
     //TODO: Right now hardcoding the package name and version, in production we can get it from package.json
     public static readonly FORWARD_CURSOR_REDIS_KEY = Constants.APP_NAME + ":" + Constants.APP_VERSION + ":forward-cursor";
@@ -13,5 +13,9 @@ export class Constants {
 
     public static readonly  BACKUP_DATA_PATH = path.join("./", 'backup');
     public static readonly  DATA_LOGS_PATH = path.join("./", 'data');
+
+    public static DEFAULT_LIVE_BLOCK_FETCH_INTERVAL_SEC = 5; // Every 5 seconds
+    public static HISTORICAL_BATCH_INSERT_INTERVAL_SEC = 2; // Every 2 seconds
+
 
 }

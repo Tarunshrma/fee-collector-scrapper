@@ -16,6 +16,8 @@ type ChainConfig = {
     secondary_rpc_url: string,
     seed_block: number,
     block_batch_size: number
+    live_fee_fetch_interval_in_seconds: number,
+    historical_fee_batch_insert_interval_in_seconds: number
 }
 
 /**

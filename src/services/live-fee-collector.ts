@@ -5,9 +5,6 @@ import { BaseFeeCollector } from "./base-fee-collector";
 import { CacheInterface } from "./interfaces/cahce-inerface";
 import { Constants } from "../utils/constants";
 
-//TODO: Move it to somewhere else
-const UPDATE_INTERVAL = 1000 * 5; // Every 5 seconds
-
 /**
  * Live fee collector service
  */
@@ -24,7 +21,9 @@ export class LiveFeeCollector extends BaseFeeCollector{
     public start(cursor:number){
         this.cursor = cursor;
         if (this.fetchHandle !== null) clearInterval(this.fetchHandle);
-        this.fetchHandle = setInterval(this.fetchLiveFees.bind(this), UPDATE_INTERVAL);
+
+        const update_interval = this.config.live_fee_fetch_interval_in_seconds || Constants.DEFAULT_LIVE_BLOCK_FETCH_INTERVAL_SEC;
+        this.fetchHandle = setInterval(this.fetchLiveFees.bind(this), update_interval * 1000);
     }
 
     /**

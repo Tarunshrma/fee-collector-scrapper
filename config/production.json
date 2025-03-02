@@ -5,6 +5,8 @@
             "rpc_url":"https://polygon-rpc.com",
             "secondary_rpc_url":"",
             "seed_block": 61500000,
-            "block_batch_size":10000
+            "block_batch_size":10000,
+            "live_fee_fetch_interval_in_seconds": 5,
+            "historical_fee_batch_insert_interval_in_seconds": 2
         }
 }
