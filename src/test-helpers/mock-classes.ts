@@ -1,6 +1,7 @@
 import { CacheInterface } from "../services/interfaces/cahce-inerface";
 import { FeeRepositoryInterface } from "../services/interfaces/fee-repository-interface";
 import Web3AdapterInterface from "../services/interfaces/web3-adapter-interface";
+import { LiveFeeCollector } from "../services/live-fee-collector";
 import { ChainConfig, ParsedFeeCollectedEvents, RawEventLogs } from "../types/types";
 
 /**
@@ -62,4 +63,11 @@ export class MockCache implements CacheInterface {
     getValue(key: string): Promise<string> {
         return Promise.resolve('');
     }
-}  
+} 
+
+export class MockLiveFeeCollector extends LiveFeeCollector {
+    //override the saveParsedEvents method to expose as public method
+    public async saveParsedEvents(startBlock: string, rawEvents: RawEventLogs[]): Promise<void> {
+        await this.saveParsedEvents(startBlock, rawEvents);
+    }
+}

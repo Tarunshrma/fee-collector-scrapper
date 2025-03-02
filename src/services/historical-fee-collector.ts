@@ -1,3 +1,4 @@
+import "reflect-metadata"
 import { RawEventLogs } from "../types/types";
 import { Constants } from "../utils/constants";
 import logger from "../utils/logger";
@@ -5,7 +6,9 @@ import { BaseFeeCollector } from "./base-fee-collector";
 import fs from 'fs';
 import path from 'path';
 
-
+/**
+ * Historical fee collector service
+ */
 export class HistoricalFeeCollector extends BaseFeeCollector {
     
     constructor(protected config: any, 
