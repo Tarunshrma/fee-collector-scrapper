@@ -29,14 +29,13 @@ This project is a TypeScript-based tool designed to scrape the `FeesCollected` e
 docker-compose up -d
 ```
 
-
 ## Features
 - [x] Tool scrapes contract for emitted FeesCollected event on a given chain.
 - [x] Tool can be started at any time to retrieve new events.
 - [x] Tool works efficiently and does not scan the same blocks again.
 - [x] Retrieved events are stored in a MongoDB database using Typegoose.
-- [x] (Optional) REST endpoint to retrieve all collected events for a given integrator.
-- [x] (Optional) Application wrapped into a usable Docker image.
+- [x] REST endpoint to retrieve all collected events for a given integrator.
+- [x] Application wrapped into a usable Docker image.
 
 ## REST API Endpoint
 If enabled, the REST API provides the following endpoint:
@@ -47,8 +46,11 @@ GET /api/v1/fee/<integrator-address>?page_index=0&page_size=10
 Retrieve all FeesCollected events associated with the specified integrator.
 - `page_index` starts from 0
 - `page_size` specifies the number of events per page
-
 ## License
-This project is licensed under the MIT License. See the LICENSE file for more details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
 
 ## References
+- [Boilerplate Code Setup](https://phillcode.hashnode.dev/nodejs-console-app-with-typescript-linting-and-testing)
+- [Ether JS](https://docs.ethers.org/v6/)
+- [Typegoose](https://typegoose.github.io/)
+
