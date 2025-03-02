@@ -16,28 +16,31 @@ import { RedisClient } from './services/redis-client';
 import { Constants } from './utils/constants';
 import { FeeRepositoryInterface } from './services/interfaces/fee-repository-interface';
 import { FeeMongoDBRepository } from './services/fee-mongodb-repository';
+import { FeeRouter } from './routes/v1/fee';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(logger_middleware);
 
-app.get('/', (req: Request, res: Response) => {
+app.get('/api/', (req: Request, res: Response) => {
     res.send("I am working");
 });
   
 // Health endpoint that returns a simple status message
-app.get('/health', (req: Request, res: Response) => {
+app.get('/api/health', (req: Request, res: Response) => {
     //TODO: Add additional health checkes like rpc reachablity, db reachability, etc.
     res.json({ status: 'ok' });
 });
 
 // Readiness endpoint that returns a simple status message
-app.get('/ready', (req: Request, res: Response) => {
+app.get('/api/ready', (req: Request, res: Response) => {
   //TODO: Add additional health checkes like rpc reachablity, db reachability, etc.
   res.json({ status: 'ok' });
 });
-  
+
+
+
 const server = app.listen(PORT, () => {
     logger.info(`Server is running on http://localhost:${PORT}`);
 });
@@ -70,6 +73,10 @@ async function start() {
         const etherJSFeeCollector = new EtherJSFeesCollectorAdapter<RawEventLogs,ParsedFeeCollectedEvents>(chainConfig);
         feeCollector = new FeeCollector(chainConfig,eventEmitter,etherJSFeeCollector);
         
+        //Initialize the fee router
+        const feeRouter = new FeeRouter();
+        app.use('/api', feeRouter.router);
+
         await feeCollector.setup();
         await feeCollector.fetchFees();
 
@@ -105,3 +112,4 @@ process.on('SIGTERM', async () => {
 })
 
 start()
+
