@@ -18,7 +18,7 @@ This project is a TypeScript-based tool designed to scrape the `FeesCollected` e
 
 ## High Level Design
 
-![High Level Design](./resources/high_level_design.png)
+![High Level Design](./resources/high_level_design_1.0.png)
 
 ## Installation
 
