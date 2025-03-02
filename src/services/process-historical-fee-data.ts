@@ -30,6 +30,26 @@ export class ProcessHistoricalFeeData {
 
         this.updateInterval = this.chainConfig.historical_fee_batch_insert_interval_in_seconds || Constants.HISTORICAL_BATCH_INSERT_INTERVAL_SEC;
         this.subscribeEvents()
+        this.loadDownloadedFilesForProcessing()
+    }
+
+    /**
+     * load downloaded files for processing if there is any pending files in data folder
+     * This is to handle the case where the service is restarted
+     */
+    private loadDownloadedFilesForProcessing(){
+        try{
+            const files = fs.readdirSync(Constants.DATA_LOGS_PATH)
+            //extract block number from the file name and add to pending operations
+            files.map((file) => {
+                const block_number = file.split('.')[0]
+                this.pendingOperations.push(block_number)
+
+                console.log(`Adding block ${block_number} to pending operations`)
+            });
+        }catch(e){
+            logger.warn("[loadDownloadedFilesForProcessing]:error loading downloaded files for processing", e)
+        }
     }
 
     /**
