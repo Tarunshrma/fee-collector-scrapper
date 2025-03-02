@@ -13,9 +13,9 @@ import { container } from "tsyringe";
 import { CacheInterface } from "./interfaces/cahce-inerface";
 import { ChainConfig } from "../types/types";
 
-
-// const UPDATE_INTERVAL = 1000 * 2; // Every 2 seconds
-
+/**
+ * ProcessHistoricalFeeData class
+ */
 export class ProcessHistoricalFeeData {
 
     private pendingOperations:string[] = []
@@ -31,8 +31,6 @@ export class ProcessHistoricalFeeData {
         this.updateInterval = this.chainConfig.historical_fee_batch_insert_interval_in_seconds || Constants.HISTORICAL_BATCH_INSERT_INTERVAL_SEC;
         this.subscribeEvents()
     }
-
-
 
     /**
      * Subscribe to events
