@@ -61,6 +61,12 @@ export class ProcessHistoricalFeeData {
 
             if (filePath === undefined) return;
 
+            //FIXME: Need to investigate why the file is not getting created
+            if (fs.existsSync(filePath) === false) {
+                logger.error(`file ${filePath} does not exist`)
+                return
+            }
+
             const readerStream = fs.createReadStream(filePath,'utf8')
             let parsed_data:any = ""
 
