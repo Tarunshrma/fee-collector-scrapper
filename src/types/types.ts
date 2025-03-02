@@ -30,8 +30,8 @@ type ChainConfig = {
 type ParsedFeeCollectedEvents = {
     token: string;
     integrator: string;
-    integratorFee: BigNumber;
-    lifiFee: BigNumber;
+    integratorFee: string;
+    lifiFee: string;
 }
 
 

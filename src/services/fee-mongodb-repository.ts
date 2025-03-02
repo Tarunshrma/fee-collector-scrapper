@@ -61,8 +61,8 @@ export class FeeMongoDBRepository implements FeeRepositoryInterface {
                 fees.map((fee) => ({
                   token: fee.token,
                   integrator: fee.integrator,
-                  integratorFee: fee.integratorFee.toString(),
-                  lifiFee: fee.lifiFee.toString(),
+                  integratorFee: fee.integratorFee,
+                  lifiFee: fee.lifiFee,
                 }))
               );
             return true

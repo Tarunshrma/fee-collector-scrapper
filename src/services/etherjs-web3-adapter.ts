@@ -45,8 +45,8 @@ export class EtherJSFeesCollectorAdapter<Event extends RawEventLogs,Type> implem
                     const feesCollected: Type = {
                         token: parsedEvent.args[0],
                         integrator: parsedEvent.args[1],
-                        integratorFee: BigNumber.from(parsedEvent.args[2]),
-                        lifiFee: BigNumber.from(parsedEvent.args[3]),
+                        integratorFee: BigNumber.from(parsedEvent.args[2]).toString(),
+                        lifiFee: BigNumber.from(parsedEvent.args[3]).toString(),
                     } as Type
                     parsedEvents.push(feesCollected)
                 }

@@ -44,6 +44,8 @@ export class HistoricalFeeCollector extends BaseFeeCollector {
                 //update the backward cursor
                 this.cursor = start_block;
             }
+
+            logger.info('Historical fee collection completed')
             
         }catch(error){
             throw error

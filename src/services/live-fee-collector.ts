@@ -1,5 +1,5 @@
 import { container } from "tsyringe";
-import { RawEventLogs } from "../types/types";
+import { ParsedFeeCollectedEvents, RawEventLogs } from "../types/types";
 import logger from "../utils/logger";
 import { BaseFeeCollector } from "./base-fee-collector";
 import { CacheInterface } from "./interfaces/cahce-inerface";
@@ -60,7 +60,7 @@ export class LiveFeeCollector extends BaseFeeCollector{
     protected async saveParsedEvents(startBlock: string, rawEvents: RawEventLogs[]): Promise<void> {
         try{
             const parsedEvents = await this.web3AdapterInterface.parseRawBlocks(rawEvents)
-        
+
             //Save the parsed events to a database and then store the cursor in cache
             await this.feeRepository.storeFee(parsedEvents)
             
