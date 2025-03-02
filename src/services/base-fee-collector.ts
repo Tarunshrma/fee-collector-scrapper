@@ -1,4 +1,3 @@
-import { promises } from "dns"
 import logger from "../utils/logger"
 import { RawEventLogs } from "../types/types"
 import { FeeRepositoryInterface } from "./interfaces/fee-repository-interface";

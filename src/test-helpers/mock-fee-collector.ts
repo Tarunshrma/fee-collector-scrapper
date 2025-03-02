@@ -5,11 +5,11 @@ import { ChainConfig, ParsedFeeCollectedEvents, RawEventLogs } from "../types/ty
 export class MockFeesCollectorAdapter implements Web3AdapterInterface<RawEventLogs, ParsedFeeCollectedEvents>{
     constructor(private feeCollectorconfig: ChainConfig){}
   
-    public async fetchRawFeesCollectedEvents(from:number ,to :number): Promise<RawEventLogs[]>{
+    public async fetchRawFeesCollectedEvents(_from:number ,_to :number): Promise<RawEventLogs[]>{
         return [];
     }
   
-    public async parseRawBlocks(rawBlocksEvent:RawEventLogs[]): Promise<ParsedFeeCollectedEvents[]>{
+    public async parseRawBlocks(_rawBlocksEvent:RawEventLogs[]): Promise<ParsedFeeCollectedEvents[]>{
         return []
     }
   

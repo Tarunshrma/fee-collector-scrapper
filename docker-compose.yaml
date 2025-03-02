@@ -17,5 +17,19 @@ services:
     volumes:
       - mongo-data:/data/db
 
+  fee-service:
+    build: ./
+    ports:
+      - "3000:3000"
+    depends_on:
+      - redis
+      - mongo
+    environment:
+      PORT: 3000
+      LOG_LEVEL: debug
+      CHAIN_ID: 137
+      REDIS_URL: redis://localhost:6379
+      MONGODB_URL: localhost:27017
+      MONGODB_DB: collected-fee
 volumes:
-  mongo-data:
+    mongo-data:

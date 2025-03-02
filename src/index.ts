@@ -13,7 +13,6 @@ import { EtherJSFeesCollectorAdapter } from './services/etherjs-web3-adapter';
 import { container } from 'tsyringe';
 import { CacheInterface } from './services/interfaces/cahce-inerface';
 import { RedisClient } from './services/redis-client';
-import { Constants } from './utils/constants';
 import { FeeRepositoryInterface } from './services/interfaces/fee-repository-interface';
 import { FeeMongoDBRepository } from './services/fee-mongodb-repository';
 import { FeeRouter } from './routes/v1/fee';

@@ -1,4 +1,4 @@
-import { getModelForClass, index, pre, prop } from "@typegoose/typegoose";
+import { getModelForClass, index,  prop } from "@typegoose/typegoose";
   
 @index({ integrator: 1})
 class CollectedFee {

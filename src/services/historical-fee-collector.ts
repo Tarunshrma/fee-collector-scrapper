@@ -1,11 +1,9 @@
-import { container } from "tsyringe";
 import { RawEventLogs } from "../types/types";
 import { Constants } from "../utils/constants";
 import logger from "../utils/logger";
 import { BaseFeeCollector } from "./base-fee-collector";
 import fs from 'fs';
 import path from 'path';
-import { CacheInterface } from "./interfaces/cahce-inerface";
 
 
 export class HistoricalFeeCollector extends BaseFeeCollector {

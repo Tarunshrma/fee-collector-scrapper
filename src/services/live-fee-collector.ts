@@ -1,5 +1,5 @@
 import { container } from "tsyringe";
-import { ParsedFeeCollectedEvents, RawEventLogs } from "../types/types";
+import { RawEventLogs } from "../types/types";
 import logger from "../utils/logger";
 import { BaseFeeCollector } from "./base-fee-collector";
 import { CacheInterface } from "./interfaces/cahce-inerface";

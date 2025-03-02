@@ -18,8 +18,8 @@ export class FeeMongoDBRepository implements FeeRepositoryInterface {
     public async connect(): Promise<void> {
         try{
             logger.info('Connecting to MongoDB')
-            const user_name = process.env.MONGODB_USERNAME;
-            const password = process.env.MONGODB_PASSWORD;
+            // const user_name = process.env.MONGODB_USERNAME;
+            // const password = process.env.MONGODB_PASSWORD;
             const host = process.env.MONGODB_URL;
             const db = process.env.MONGODB_DB;
 

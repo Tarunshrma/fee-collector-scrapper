@@ -1,5 +1,5 @@
-import { BlockTag, ethers } from "ethers";
-import { ChainConfig, ParsedFeeCollectedEvents, RawEventLogs } from "../types/types";
+import { ethers } from "ethers";
+import { ChainConfig, RawEventLogs } from "../types/types";
 import {FeeCollector__factory} from '../../lifi-contract-types'
 import {BigNumber} from '@ethersproject/bignumber';
 
@@ -38,7 +38,7 @@ export class EtherJSFeesCollectorAdapter<Event extends RawEventLogs,Type> implem
 
     public async parseRawBlocks(rawBlocksEvent:Event[]): Promise<Type[]>{
         try{
-            let parsedEvents: Type[] = []
+            const parsedEvents: Type[] = []
             rawBlocksEvent.forEach(event => {
                 const parsedEvent = this.feeCollectorContract.interface.parseLog(event)
                 if (parsedEvent !== null) {
