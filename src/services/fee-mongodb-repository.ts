@@ -72,25 +72,20 @@ export class FeeMongoDBRepository implements FeeRepositoryInterface {
     }
 
     /**
-     * store historical fee into the database as batch operation
-     * @param filePaths 
-     */
-    storeFeeInBatch(filePaths: string): Promise<boolean> {
-        throw new Error("Method not implemented.");
-    }
-
-    /**
      * Get fee from the database
      * @param integrator 
+     * @param page_index
+     * @param page_size
      */
-    public async getFee(integrator: string): Promise<ParsedFeeCollectedEvents[]> {
-        try{
-            const collected_fees = await CollectedFeeModel.find({
-                integrator,
-            }).exec()
+    public async getFee(integrator: string, page_index: number = 0, page_size: number = 10): Promise<ParsedFeeCollectedEvents[]> {
+        try {
+            const collected_fees = await CollectedFeeModel.find({ integrator })
+                .skip(page_index * page_size) 
+                .limit(page_size)            
+                .exec();
             return collected_fees;  
-        }catch(err){
-            throw err
+        } catch(err) {
+            throw err;
         }
     }
     

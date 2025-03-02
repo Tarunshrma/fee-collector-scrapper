@@ -30,7 +30,20 @@ export class FeeRouter {
                 return;
             }
 
-            const fees = await this.feeRepository.getFee(integrator);
+            if (page_index !== undefined && 
+                    typeof page_index !== 'number' &&
+                page_index < 0) {
+                res.status(400).send('page_index must be a positive number');
+                return;
+            }
+
+            if (page_size !== undefined && 
+                    typeof page_size !== 'number' &&
+                page_size < 0) {
+                res.status(400).send('page_size must be a positive number');
+                return;
+            }
+            const fees = await this.feeRepository.getFee(integrator, page_index!, page_size!);
             res.json({ fees });
         } catch (error) {
             console.error(error);

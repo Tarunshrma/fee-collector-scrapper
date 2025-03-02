@@ -21,14 +21,10 @@ export interface FeeRepositoryInterface{
     storeFee(fee:ParsedFeeCollectedEvents[]): Promise<boolean>;
 
     /**
-     * store historical fee into the database as batch operation 
-     * @param filePaths locally saved fee files 
-     */
-    storeFeeInBatch(filePaths:string): Promise<boolean>;
-    
-    /**
      * get fee from the database
      * @param integrator
+     * @param page_index
+     * @param page_size
      */
-    getFee(integrator: string): Promise<ParsedFeeCollectedEvents[]>;
+    getFee(integrator: string,page_index: number, page_size: number): Promise<ParsedFeeCollectedEvents[]>;
 }
