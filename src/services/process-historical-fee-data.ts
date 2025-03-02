@@ -109,11 +109,11 @@ export class ProcessHistoricalFeeData {
                 //save the backward cursor in cache
                 await this.cache.setValue(Constants.BACKWARD_CURSOR_REDIS_KEY,block_number);
                 
-                logger.debug("data reading finished, move the file to backup, a seperate location like S3 bucket")
+                logger.debug(`Block file ${block_number} processed successfully`)
                 //TODO: For now we are moving the file to backup, in production we can move it to S3 bucket
                 fs.rename(filePath, path.join(Constants.BACKUP_DATA_PATH, `backup-${path.basename(filePath)}`), (err) => {
                     if (err) throw err;
-                    logger.debug('File moved to backup');
+                    //logger.debug('File moved to backup');
                 });
             })
         }
