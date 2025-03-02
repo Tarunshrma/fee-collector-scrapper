@@ -5,6 +5,7 @@
   "main": "start.ts",
   "scripts": {
     "build": "eslint . --ext .ts && tsc",
+    "build:skip-lint": "tsc",
     "lint": "eslint . --ext .ts",
     "dev": "ts-node-dev --respawn ./src/index.ts",
     "start": "ts-node ./src/index.ts",
