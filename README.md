@@ -25,7 +25,7 @@ This project is a TypeScript-based tool designed to scrape the `FeesCollected` e
 1. **Clone the repository:**
 	```bash
 	git clone git@github.com:Tarunshrma/fee-collector-scrapper.git
-	cd fees-collected-scraper
+	cd fee-collected-scraper
 	```
 
 ## Running the Application Using Docker Compose
