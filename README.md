@@ -24,7 +24,7 @@ This project is a TypeScript-based tool designed to scrape the `FeesCollected` e
 
 1. **Clone the repository:**
 	```bash
-	git clone git@github.com:Tarunshrma/fee-collector-scrapper.git
+	git clone --recurse-submodules git@github.com:Tarunshrma/fee-collector-scrapper.git
 	cd fee-collector-scrapper
 	```
 
