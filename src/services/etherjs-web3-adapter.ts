@@ -19,10 +19,10 @@ export class EtherJSFeesCollectorAdapter<Event extends RawEventLogs,Type> implem
     constructor(private feeCollectorconfig: ChainConfig){
 
         this.feeCollectorconfig = feeCollectorconfig;
-        this.jsonProvider = new ethers.JsonRpcProvider(this.feeCollectorconfig.rpc_url)
+        this.jsonProvider = new ethers.JsonRpcProvider(this.feeCollectorconfig.rpcUrl)
 
         const feeCollectorInterface = new ethers.Interface(FeeCollector__factory.abi)
-        this.feeCollectorContract = new ethers.Contract(this.feeCollectorconfig.contract_address, feeCollectorInterface, this.jsonProvider)
+        this.feeCollectorContract = new ethers.Contract(this.feeCollectorconfig.contractAddress, feeCollectorInterface, this.jsonProvider)
         this.feeCollectorFilter = this.feeCollectorContract.filters.FeesCollected()
     }
 

@@ -40,9 +40,9 @@ export class HistoricalFeeCollector extends BaseFeeCollector {
             }
 
             //fetch events from the blockchain until the seed block
-            while(this.cursor > this.config.seed_block){
+            while(this.cursor > this.config.seedBlock){
                 //fetch events in batches
-                const startBlock = this.cursor - this.config.block_batch_size;
+                const startBlock = this.cursor - this.config.blockBatchSize;
                 await this.collectFee(startBlock, this.cursor)
                 //update the backward cursor
                 this.cursor = startBlock;

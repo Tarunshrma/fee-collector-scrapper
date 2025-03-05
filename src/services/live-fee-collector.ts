@@ -24,7 +24,7 @@ export class LiveFeeCollector extends BaseFeeCollector{
         this.cursor = cursor;
         if (this.fetchHandle !== null) clearInterval(this.fetchHandle);
 
-        const updateInterval = this.config.live_fee_fetch_interval_in_seconds || Constants.DEFAULT_LIVE_BLOCK_FETCH_INTERVAL_SEC;
+        const updateInterval = this.config.liveFeeFetchIntervalInSeconds || Constants.DEFAULT_LIVE_BLOCK_FETCH_INTERVAL_SEC;
         this.fetchHandle = setInterval(this.fetchLiveFees.bind(this), updateInterval * 1000);
     }
 

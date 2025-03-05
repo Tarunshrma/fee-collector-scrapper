@@ -4,19 +4,21 @@ import { ethers } from 'ethers';
  * ChainConfig type
  * @typedef {Object} ChainConfig
  * @property {string} contract_address - Contract address to fetch fees from
- * @property {string} rpc_url - RPC URL to fetch fees from
- * @property {string} secondary_rpc_url - Secondary RPC URL to use in case primary RPC URL fails
- * @property {string} seed_block - oldest block number till which to fetch fees
- * @property {number} block_batch_size - Number of blocks to fetch in a single batch
+ * @property {string} rpcUrl - RPC URL to fetch fees from
+ * @property {string} secondaryRpcUrl - Secondary RPC URL to use in case primary RPC URL fails
+ * @property {string} seedBlock - oldest block number till which to fetch fees
+ * @property {number} blockBatchSize - Number of blocks to fetch in a single batch
+ * @property {number} liveFeeFetchIntervalInSeconds - Interval in seconds to fetch live fees
+ * @property {number} historicalFeeBatchInsertIntervalInSeconds - Interval in seconds to insert historical fees
  */
 type ChainConfig = {
-    contract_address: string,
-    rpc_url: string,
-    secondary_rpc_url: string,
-    seed_block: number,
-    block_batch_size: number
-    live_fee_fetch_interval_in_seconds: number,
-    historical_fee_batch_insert_interval_in_seconds: number
+    contractAddress: string,
+    rpcUrl: string,
+    secondaryRpcUrl: string,
+    seedBlock: number,
+    blockBatchSize: number
+    liveFeeFetchIntervalInSeconds: number,
+    historicalFeeBatchInsertIntervalInSeconds: number
 }
 
 /**

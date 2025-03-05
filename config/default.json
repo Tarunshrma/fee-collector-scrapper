@@ -1,12 +1,12 @@
 {
     "137":
         {
-            "contract_address":"0xbD6C7B0d2f68c2b7805d88388319cfB6EcB50eA9",
-            "rpc_url":"https://polygon-rpc.com",
-            "secondary_rpc_url":"",
-            "seed_block": 61500000,
-            "block_batch_size":10000,
-            "live_fee_fetch_interval_in_seconds": 5,
-            "historical_fee_batch_insert_interval_in_seconds": 1
+            "contractAddress":"0xbD6C7B0d2f68c2b7805d88388319cfB6EcB50eA9",
+            "rpcUrl":"https://polygon-rpc.com",
+            "secondaryRpcUrl":"",
+            "seedBlock": 61500000,
+            "blockBatchSize":10000,
+            "liveFeeFetchIntervalInSeconds": 5,
+            "historicalFeeBatchInsertIntervalInSeconds": 1
         }
 }

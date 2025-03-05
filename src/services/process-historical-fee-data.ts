@@ -28,7 +28,7 @@ export class ProcessHistoricalFeeData {
         this.feeRepository = container.resolve<FeeRepositoryInterface>('FeeRepositoryInterface');
         this.cache = container.resolve<CacheInterface>('CacheInterface');
 
-        this.updateInterval = this.chainConfig.historical_fee_batch_insert_interval_in_seconds || Constants.HISTORICAL_BATCH_INSERT_INTERVAL_SEC;
+        this.updateInterval = this.chainConfig.historicalFeeBatchInsertIntervalInSeconds || Constants.HISTORICAL_BATCH_INSERT_INTERVAL_SEC;
         this.subscribeEvents()
         this.loadDownloadedFilesForProcessing()
     }
