@@ -2,7 +2,6 @@ require('dotenv').config()
 const config = require('config');
 import 'reflect-metadata';
 import express, {Request, Response} from 'express';
-import logger_middleware from './middleware/logger';
 import logger from './utils/logger';
 import { FeeCollector } from './services/fee-collector';
 import { ChainConfig, ParsedFeeCollectedEvents, RawEventLogs } from './types/types';
@@ -16,11 +15,12 @@ import { RedisClient } from './services/redis-client';
 import { FeeRepositoryInterface } from './services/interfaces/fee-repository-interface';
 import { FeeMongoDBRepository } from './services/fee-mongodb-repository';
 import { FeeRouter } from './routes/v1/fee';
+import loggerMiddleware from './middleware/logger';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(logger_middleware);
+app.use(loggerMiddleware);
 
 const server = app.listen(PORT, () => {
     logger.info(`Server is running on http://localhost:${PORT}`);

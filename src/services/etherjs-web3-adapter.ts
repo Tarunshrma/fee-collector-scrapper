@@ -59,7 +59,7 @@ export class EtherJSFeesCollectorAdapter<Event extends RawEventLogs,Type> implem
     }
 
     public async getLatestBlockNumber(): Promise<number> {
-        const current_block = await this.jsonProvider.getBlockNumber();
-        return current_block;
+        const currentBlock = await this.jsonProvider.getBlockNumber();
+        return currentBlock;
     }
 } 

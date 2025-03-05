@@ -42,10 +42,10 @@ export class ProcessHistoricalFeeData {
             const files = fs.readdirSync(Constants.DATA_LOGS_PATH)
             //extract block number from the file name and add to pending operations
             files.map((file) => {
-                const block_number = file.split('.')[0]
-                this.pendingOperations.push(block_number)
+                const blockNumber = file.split('.')[0]
+                this.pendingOperations.push(blockNumber)
 
-                console.log(`Adding block ${block_number} to pending operations`)
+                console.log(`Adding block ${blockNumber} to pending operations`)
             });
         }catch(e){
             logger.warn("[loadDownloadedFilesForProcessing]:error loading downloaded files for processing", e)
@@ -74,8 +74,8 @@ export class ProcessHistoricalFeeData {
     private async processPendingOperations(){
         if(this.pendingOperations.length > 0){
             
-            const block_number = this.pendingOperations.pop();
-            const filePath = path.join(Constants.DATA_LOGS_PATH, `${block_number}.json`);
+            const blockNumber = this.pendingOperations.pop();
+            const filePath = path.join(Constants.DATA_LOGS_PATH, `${blockNumber}.json`);
 
             if (filePath === undefined) return;
 
@@ -86,11 +86,11 @@ export class ProcessHistoricalFeeData {
             }
 
             const readerStream = fs.createReadStream(filePath,'utf8')
-            let parsed_data:any = ""
+            let parsedData:any = ""
 
             readerStream.on('data', (chunk: any) => {
                 if (chunk !== undefined){
-                    parsed_data = parsed_data + chunk
+                    parsedData = parsedData + chunk
                 }
             });
 
@@ -98,18 +98,18 @@ export class ProcessHistoricalFeeData {
                 // delete the file
                 let data = []
                 try{
-                    data = JSON.parse(parsed_data)
+                    data = JSON.parse(parsedData)
                 }catch(e){
                     logger.error(`error parsing json ${filePath} adding back to process queue to retry`, e)
-                    this.pendingOperations.push(block_number!)
+                    this.pendingOperations.push(blockNumber!)
                     return
                 }
                 
                 await this.feeRepository.storeFee(data)   
                 //save the backward cursor in cache
-                await this.cache.setValue(Constants.BACKWARD_CURSOR_REDIS_KEY,block_number);
+                await this.cache.setValue(Constants.BACKWARD_CURSOR_REDIS_KEY,blockNumber);
                 
-                logger.debug(`Block file ${block_number} processed successfully`)
+                logger.debug(`Block file ${blockNumber} processed successfully`)
                 //TODO: For now we are moving the file to backup, in production we can move it to S3 bucket
                 fs.rename(filePath, path.join(Constants.BACKUP_DATA_PATH, `backup-${path.basename(filePath)}`), (err) => {
                     if (err) throw err;

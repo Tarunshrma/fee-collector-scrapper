@@ -1,9 +1,11 @@
 import { container } from "tsyringe";
-import { RawEventLogs } from "../types/types";
+import { ChainConfig, ParsedFeeCollectedEvents, RawEventLogs } from "../types/types";
 import logger from "../utils/logger";
 import { BaseFeeCollector } from "./base-fee-collector";
 import { CacheInterface } from "./interfaces/cahce-inerface";
 import { Constants } from "../utils/constants";
+import Web3AdapterInterface from "./interfaces/web3-adapter-interface";
+import { EventEmitter } from "stream";
 
 /**
  * Live fee collector service
@@ -12,9 +14,9 @@ export class LiveFeeCollector extends BaseFeeCollector{
    
     private fetchHandle: NodeJS.Timeout | null = null;
     
-    constructor(protected config: any, 
-                    protected eventEmitter: any, 
-                    protected web3AdapterInterface: any){
+    constructor(protected config: ChainConfig, 
+                    protected eventEmitter: EventEmitter, 
+                    protected web3AdapterInterface: Web3AdapterInterface<RawEventLogs, ParsedFeeCollectedEvents>){
         super(config, eventEmitter, web3AdapterInterface)
     } 
 
@@ -22,8 +24,8 @@ export class LiveFeeCollector extends BaseFeeCollector{
         this.cursor = cursor;
         if (this.fetchHandle !== null) clearInterval(this.fetchHandle);
 
-        const update_interval = this.config.live_fee_fetch_interval_in_seconds || Constants.DEFAULT_LIVE_BLOCK_FETCH_INTERVAL_SEC;
-        this.fetchHandle = setInterval(this.fetchLiveFees.bind(this), update_interval * 1000);
+        const updateInterval = this.config.live_fee_fetch_interval_in_seconds || Constants.DEFAULT_LIVE_BLOCK_FETCH_INTERVAL_SEC;
+        this.fetchHandle = setInterval(this.fetchLiveFees.bind(this), updateInterval * 1000);
     }
 
     /**

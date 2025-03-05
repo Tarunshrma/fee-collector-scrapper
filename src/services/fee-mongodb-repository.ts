@@ -74,16 +74,16 @@ export class FeeMongoDBRepository implements FeeRepositoryInterface {
     /**
      * Get fee from the database
      * @param integrator 
-     * @param page_index
-     * @param page_size
+     * @param pageIndex
+     * @param pageSize
      */
-    public async getFee(integrator: string, page_index: number = 0, page_size: number = 10): Promise<ParsedFeeCollectedEvents[]> {
+    public async getFee(integrator: string, pageIndex: number = 0, pageSize: number = 10): Promise<ParsedFeeCollectedEvents[]> {
         try {
-            const collected_fees = await CollectedFeeModel.find({ integrator })
-                .skip(page_index * page_size) 
-                .limit(page_size)            
+            const collectedFees = await CollectedFeeModel.find({ integrator })
+                .skip(pageIndex * pageSize) 
+                .limit(pageSize)            
                 .exec();
-            return collected_fees;  
+            return collectedFees;  
         } catch(err) {
             throw err;
         }

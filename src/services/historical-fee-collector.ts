@@ -1,19 +1,21 @@
 import "reflect-metadata"
-import { RawEventLogs } from "../types/types";
+import { ChainConfig, ParsedFeeCollectedEvents, RawEventLogs } from "../types/types";
 import { Constants } from "../utils/constants";
 import logger from "../utils/logger";
 import { BaseFeeCollector } from "./base-fee-collector";
 import fs from 'fs';
 import path from 'path';
+import Web3AdapterInterface from "./interfaces/web3-adapter-interface";
+import EventEmitter from "events";
 
 /**
  * Historical fee collector service
  */
 export class HistoricalFeeCollector extends BaseFeeCollector {
     
-    constructor(protected config: any, 
-        protected eventEmitter: any, 
-        protected web3AdapterInterface: any){
+    constructor(protected config: ChainConfig, 
+        protected eventEmitter: EventEmitter, 
+        protected web3AdapterInterface: Web3AdapterInterface<RawEventLogs, ParsedFeeCollectedEvents>){
             super(config, eventEmitter, web3AdapterInterface)
     } 
 
@@ -40,10 +42,10 @@ export class HistoricalFeeCollector extends BaseFeeCollector {
             //fetch events from the blockchain until the seed block
             while(this.cursor > this.config.seed_block){
                 //fetch events in batches
-                const start_block = this.cursor - this.config.block_batch_size;
-                await this.collectFee(start_block, this.cursor)
+                const startBlock = this.cursor - this.config.block_batch_size;
+                await this.collectFee(startBlock, this.cursor)
                 //update the backward cursor
-                this.cursor = start_block;
+                this.cursor = startBlock;
             }
 
             logger.info('Historical fee collection completed')

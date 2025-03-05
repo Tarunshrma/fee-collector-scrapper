@@ -23,8 +23,8 @@ export interface FeeRepositoryInterface{
     /**
      * get fee from the database
      * @param integrator
-     * @param page_index
-     * @param page_size
+     * @param pageIndex
+     * @param pageSize
      */
-    getFee(integrator: string,page_index: number, page_size: number): Promise<ParsedFeeCollectedEvents[]>;
+    getFee(integrator: string,pageIndex: number, pageSize: number): Promise<ParsedFeeCollectedEvents[]>;
 }

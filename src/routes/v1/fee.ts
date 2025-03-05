@@ -20,8 +20,8 @@ export class FeeRouter {
 
     private getFees = async (req: Request, res: Response): Promise<void> => {
         try {
-            const page_index = req.query.page_index as number | undefined;
-            const page_size = req.query.page_size as number | undefined;
+            const pageIndex = req.query.pageIndex as number | undefined;
+            const pageSize = req.query.pageSize as number | undefined;
 
             const integrator = req.params.integrator as string | undefined;
 
@@ -30,20 +30,20 @@ export class FeeRouter {
                 return;
             }
 
-            if (page_index !== undefined && 
-                    typeof page_index !== 'number' &&
-                page_index < 0) {
-                res.status(400).send('page_index must be a positive number');
+            if (pageIndex !== undefined && 
+                    typeof pageIndex !== 'number' &&
+                pageIndex < 0) {
+                res.status(400).send('pageIndex must be a positive number');
                 return;
             }
 
-            if (page_size !== undefined && 
-                    typeof page_size !== 'number' &&
-                page_size < 0) {
-                res.status(400).send('page_size must be a positive number');
+            if (pageSize !== undefined && 
+                    typeof pageSize !== 'number' &&
+                pageSize < 0) {
+                res.status(400).send('pageSize must be a positive number');
                 return;
             }
-            const fees = await this.feeRepository.getFee(integrator, page_index!, page_size!);
+            const fees = await this.feeRepository.getFee(integrator, pageIndex!, pageSize!);
             res.json({ fees });
         } catch (error) {
             console.error(error);

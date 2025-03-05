@@ -17,7 +17,7 @@ export class FeeCollector implements FeeCollectorInterface{
     private backwardCursor: number = 0;
     private forwardCursor: number = 0;
 
-    private setup_complete: boolean = false;
+    private setupComplete: boolean = false;
 
     private liveFeeCollector:LiveFeeCollector;
     private historicalFeeCollector:HistoricalFeeCollector;
@@ -37,27 +37,27 @@ export class FeeCollector implements FeeCollectorInterface{
             //WORKAROUND: Setting up cursors to start from the current block
             const cache = container.resolve<CacheInterface>('CacheInterface');
             
-            const forward_cursor = await cache.getValue(Constants.FORWARD_CURSOR_REDIS_KEY);
-            const backward_cursor = await cache.getValue(Constants.BACKWARD_CURSOR_REDIS_KEY);
+            const forwardCursor = await cache.getValue(Constants.FORWARD_CURSOR_REDIS_KEY);
+            const backwardCursor = await cache.getValue(Constants.BACKWARD_CURSOR_REDIS_KEY);
     
-            if (forward_cursor == null && 
-                    backward_cursor == null) {
+            if (forwardCursor == null && 
+                    backwardCursor == null) {
 
                 logger.info('No cursors found in cache, this might be the first run of the service');
                 
-                const current_block = await this.web3AdapterInterface.getLatestBlockNumber();
-                this.backwardCursor = current_block;
-                this.forwardCursor = current_block + 1;
+                const currentBlock = await this.web3AdapterInterface.getLatestBlockNumber();
+                this.backwardCursor = currentBlock;
+                this.forwardCursor = currentBlock + 1;
             }else{
                 //Load the cursors from cache
-                this.backwardCursor = parseInt(backward_cursor) - 1;
-                this.forwardCursor = parseInt(forward_cursor) + 1;
+                this.backwardCursor = parseInt(backwardCursor) - 1;
+                this.forwardCursor = parseInt(forwardCursor) + 1;
             }
 
             console.log('Forward cursor:', this.forwardCursor);
             console.log('Backward cursor:', this.backwardCursor);
 
-            this.setup_complete = true;
+            this.setupComplete = true;
         }catch(error){
             logger.error(`Error setting up fee collector: ${error}`)
         }
@@ -67,7 +67,7 @@ export class FeeCollector implements FeeCollectorInterface{
      * Fetch fees from target blockchain
      */
     public async fetchFees(): Promise<void>{
-        if(!this.setup_complete){
+        if(!this.setupComplete){
             throw new Error('Fee collector setup not complete');
         }
         await Promise.all(
@@ -84,7 +84,7 @@ export class FeeCollector implements FeeCollectorInterface{
     */
     private async fetchLiveBlocks(): Promise<void>{
         try{
-            if(!this.setup_complete){
+            if(!this.setupComplete){
                 throw new Error('Fee collector setup not complete');
             }
             
@@ -102,7 +102,7 @@ export class FeeCollector implements FeeCollectorInterface{
     private async fetchHistoricalBlocks(): Promise<void>{
         try{
 
-            if(!this.setup_complete){
+            if(!this.setupComplete){
                 throw new Error('Fee collector setup not complete');
             }
             this.historicalFeeCollector.start(this.backwardCursor)
@@ -118,7 +118,7 @@ export class FeeCollector implements FeeCollectorInterface{
      * Stop the fee collector service and clean up resources
      */
     public stop(): void {
-        if(!this.setup_complete){
+        if(!this.setupComplete){
             throw new Error('Fee collector setup not complete');
         }
         logger.info('Stopping fee collector service')
